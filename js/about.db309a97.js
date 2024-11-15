@@ -1,2 +1,0 @@
-"use strict";(self["webpackChunkmovie_github_io"]=self["webpackChunkmovie_github_io"]||[]).push([[594],{603:function(u,n,t){t.r(n),t.d(n,{default:function(){return c}});var e=t(6768);const i={class:"about"};function a(u,n){return(0,e.uX)(),(0,e.CE)("div",i,n[0]||(n[0]=[(0,e.Lk)("h1",null,"This is an about page",-1)]))}var o=t(1241);const r={},s=(0,o.A)(r,[["render",a]]);var c=s}}]);
-//# sourceMappingURL=about.db309a97.js.map
