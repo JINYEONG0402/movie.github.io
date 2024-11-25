@@ -28,8 +28,8 @@ export default defineComponent({
   height: 95svh;
   overflow-x: hidden;
   margin: auto;
+  background-color: #2e2e2e;
 }
-
 #container {
   padding: 20px;
 }

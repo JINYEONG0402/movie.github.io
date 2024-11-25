@@ -4,7 +4,7 @@
     <div class="container">
       <div id="phone">
         <div id="content-wrapper">
-          <!-- Login Form -->
+          <!-- Login Card -->
           <div :class="['card', { hidden: !isLoginVisible }]" id="login">
             <form @submit.prevent="handleLogin">
               <h1>Sign in</h1>
@@ -45,11 +45,11 @@
               class="account-check"
               @click="toggleCard"
             >
-              Already an account? <b>Sign in</b>
+              Don't have an account? <b>Sign up</b>
             </a>
           </div>
 
-          <!-- Register Form -->
+          <!-- Register Card -->
           <div :class="['card', { hidden: isLoginVisible }]" id="register">
             <form @submit.prevent="handleRegister">
               <h1>Sign up</h1>
@@ -108,7 +108,7 @@
               class="account-check"
               @click="toggleCard"
             >
-              Don't have an account? <b>Sign up</b>
+              Already have an account? <b>Sign in</b>
             </a>
           </div>
         </div>
@@ -117,103 +117,103 @@
   </div>
 </template>
 
-<script>
-import { ref, computed } from "vue";
+<script setup>
+import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
 import { authService } from "@/utils/AuthService";
 
-export default {
-  name: "LoginPage",
-  setup() {
-    const email = ref("");
-    const password = ref("");
-    const rememberMe = ref(false);
-    const errorMessage = ref("");
+const router = useRouter();
 
-    const registerEmail = ref("");
-    const registerPassword = ref("");
-    const confirmPassword = ref("");
-    const acceptTerms = ref(false);
+const isLoginVisible = ref(true);
+const email = ref("");
+const password = ref("");
+const registerEmail = ref("");
+const registerPassword = ref("");
+const confirmPassword = ref("");
+const rememberMe = ref(false);
+const acceptTerms = ref(false);
 
-    const isLoginVisible = ref(true);
+const isEmailFocused = ref(false);
+const isPasswordFocused = ref(false);
+const isRegisterEmailFocused = ref(false);
+const isRegisterPasswordFocused = ref(false);
+const isConfirmPasswordFocused = ref(false);
 
-    // Focus state
-    const isEmailFocused = ref(false);
-    const isPasswordFocused = ref(false);
-    const isRegisterEmailFocused = ref(false);
-    const isRegisterPasswordFocused = ref(false);
-    const isConfirmPasswordFocused = ref(false);
+const toggleCard = () => {
+  isLoginVisible.value = !isLoginVisible.value;
+  setTimeout(() => {
+    document.getElementById("register")?.classList.toggle("register-swap");
+    document.getElementById("login")?.classList.toggle("login-swap");
+  }, 50);
+};
 
-    // Computed properties
-    const isLoginFormValid = computed(() => email.value && password.value);
-    const isRegisterFormValid = computed(
-      () =>
-        registerEmail.value &&
-        registerPassword.value &&
-        confirmPassword.value === registerPassword.value &&
-        acceptTerms.value
-    );
+const focusInput = (inputName) => {
+  switch (inputName) {
+    case "email":
+      isEmailFocused.value = true;
+      break;
+    case "password":
+      isPasswordFocused.value = true;
+      break;
+    case "registerEmail":
+      isRegisterEmailFocused.value = true;
+      break;
+    case "registerPassword":
+      isRegisterPasswordFocused.value = true;
+      break;
+    case "confirmPassword":
+      isConfirmPasswordFocused.value = true;
+      break;
+  }
+};
 
-    // Methods
-    const handleLogin = async () => {
-      try {
-        const user = await authService.tryLogin(email.value, password.value);
-        console.log("Login successful:", user);
-        // 로그인 성공 후 동작 (예: 홈 페이지로 이동)
-      } catch (error) {
-        errorMessage.value = error.message || "Login failed";
-      }
-    };
-    const handleRegister = () => {
-      console.log("Registering with:", {
-        email: registerEmail.value,
-        password: registerPassword.value,
-        confirmPassword: confirmPassword.value,
-      });
-    };
+const blurInput = (inputName) => {
+  switch (inputName) {
+    case "email":
+      isEmailFocused.value = false;
+      break;
+    case "password":
+      isPasswordFocused.value = false;
+      break;
+    case "registerEmail":
+      isRegisterEmailFocused.value = false;
+      break;
+    case "registerPassword":
+      isRegisterPasswordFocused.value = false;
+      break;
+    case "confirmPassword":
+      isConfirmPasswordFocused.value = false;
+      break;
+  }
+};
 
-    const toggleCard = () => {
-      isLoginVisible.value = !isLoginVisible.value;
-    };
+const isLoginFormValid = computed(() => email.value && password.value);
 
-    const focusInput = (field) => {
-      if (field === "email") isEmailFocused.value = true;
-      if (field === "password") isPasswordFocused.value = true;
-      if (field === "registerEmail") isRegisterEmailFocused.value = true;
-      if (field === "registerPassword") isRegisterPasswordFocused.value = true;
-      if (field === "confirmPassword") isConfirmPasswordFocused.value = true;
-    };
+const isRegisterFormValid = computed(
+  () =>
+    registerEmail.value &&
+    registerPassword.value &&
+    confirmPassword.value &&
+    registerPassword.value === confirmPassword.value &&
+    acceptTerms.value
+);
 
-    const blurInput = (field) => {
-      if (field === "email") isEmailFocused.value = false;
-      if (field === "password") isPasswordFocused.value = false;
-      if (field === "registerEmail") isRegisterEmailFocused.value = false;
-      if (field === "registerPassword") isRegisterPasswordFocused.value = false;
-      if (field === "confirmPassword") isConfirmPasswordFocused.value = false;
-    };
+const handleLogin = async () => {
+  try {
+    const user = await authService.tryLogin(email.value, password.value);
+    router.push("/");
+  } catch (error) {
+    alert("Login failed");
+  }
+};
 
-    return {
-      email,
-      password,
-      rememberMe,
-      registerEmail,
-      registerPassword,
-      confirmPassword,
-      acceptTerms,
-      isLoginVisible,
-      isEmailFocused,
-      isPasswordFocused,
-      isRegisterEmailFocused,
-      isRegisterPasswordFocused,
-      isConfirmPasswordFocused,
-      isLoginFormValid,
-      isRegisterFormValid,
-      handleLogin,
-      handleRegister,
-      toggleCard,
-      focusInput,
-      blurInput,
-    };
-  },
+const handleRegister = async () => {
+  try {
+    await authService.tryRegister(registerEmail.value, registerPassword.value);
+    toggleCard();
+  } catch (err) {
+    alert(err.message);
+  }
 };
 </script>
 
@@ -358,6 +358,11 @@ button:hover {
   margin-top: 1.5rem;
 }
 
+.line-active {
+  border-bottom: 1px solid #2069ff !important;
+  box-shadow: 0 1px 0 #2069ff !important;
+}
+
 .input input {
   background-color: transparent;
   border: none;
@@ -392,6 +397,10 @@ button:hover {
 .label-active {
   transform: translateY(-14px) scale(0.8) !important;
   transform-origin: 0 0 !important;
+}
+
+.label-blue {
+  color: #2069ff !important;
 }
 
 [type="checkbox"]:not(:checked),

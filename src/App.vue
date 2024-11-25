@@ -1,18 +1,13 @@
 <template>
-  <div id="app">
-    <Header />
-    <router-view />
-  </div>
+  <router-view />
 </template>
 
 <script>
-import Header from "./components/home/Header.vue";
-
 export default {
-  components: {
-    Header,
-  },
+  name: "App",
 };
 </script>
 
-<style scoped></style>
+<style>
+/* app.component.css의 스타일을 여기로 복사 */
+</style>

@@ -10,9 +10,9 @@
         <nav class="nav-links desktop-nav">
           <ul>
             <li><router-link to="/">홈</router-link></li>
-            <li><router-link to="/popular">대세 콘텐츠</router-link></li>
-            <li><router-link to="/wishlist">내가 찜한 리스트</router-link></li>
-            <li><router-link to="/search">찾아보기</router-link></li>
+            <li><router-link to="/popular">카테고리</router-link></li>
+            <li><router-link to="/wishlist">위시 리스트</router-link></li>
+            <li><router-link to="/search">검 색</router-link></li>
           </ul>
         </nav>
       </div>
@@ -41,17 +41,17 @@
           </li>
           <li>
             <router-link to="/popular" @click="toggleMobileMenu"
-              >대세 콘텐츠</router-link
+              >카테고리</router-link
             >
           </li>
           <li>
             <router-link to="/wishlist" @click="toggleMobileMenu"
-              >내가 찜한 리스트</router-link
+              >위시 리스트</router-link
             >
           </li>
           <li>
             <router-link to="/search" @click="toggleMobileMenu"
-              >찾아보기</router-link
+              >검 색</router-link
             >
           </li>
         </ul>
@@ -123,7 +123,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 20px 4%;
-  background-color: transparent;
+  background-color: black;
   position: fixed;
   top: 0;
   left: 0;
