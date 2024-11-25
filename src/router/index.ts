@@ -7,7 +7,7 @@ import SearchResults from "../components/SearchResults.vue";
 // 라우트 설정
 const routes = [
   { path: "/", name: "Login", component: Login },
-  { path: "/home", name: "Home", component: Home },
+  { path: "/home", name: "Home", component: Home, props: true },
   { path: "/movie/:id", name: "MovieDetail", component: MovieDetail },
   { path: "/search", name: "SearchResults", component: SearchResults },
 ];

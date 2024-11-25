@@ -1,45 +1,69 @@
 <template>
-  <div class="home">
+  <div>
     <h1>Popular Movies</h1>
-    <div class="movie-list">
-      <div v-for="movie in movies" :key="movie.id" class="movie-item">
-        <img :src="getImageUrl(movie.poster_path)" alt="" />
-        <h3>{{ movie.title }}</h3>
-        <router-link :to="`/movie/${movie.id}`">View Details</router-link>
+    <div v-if="movies.length">
+      <div v-for="movie in movies" :key="movie.id" class="movie">
+        <img
+          :src="`https://image.tmdb.org/t/p/w500${movie.poster_path}`"
+          :alt="movie.title"
+        />
+        <p>{{ movie.title }}</p>
       </div>
     </div>
+    <p v-else>Loading movies...</p>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
-import { fetchMovies } from "@/api/tmdb";
+import axios from "axios";
 
 export default defineComponent({
   name: "HomePage",
-  setup() {
+  props: {
+    apiKey: {
+      type: String,
+      required: true,
+    },
+  },
+  setup(props) {
     const movies = ref([]);
 
-    const getImageUrl = (path: string) =>
-      `https://image.tmdb.org/t/p/w500${path}`;
+    const loadMovies = async () => {
+      try {
+        const response = await axios.get(
+          "https://api.themoviedb.org/3/movie/popular",
+          {
+            params: {
+              api_key: props.apiKey, // Use the passed API key
+            },
+          }
+        );
+        movies.value = response.data.results;
+      } catch (error) {
+        console.error("Failed to fetch movies:", error);
+        alert("영화 데이터를 불러올 수 없습니다. API 키를 확인하세요.");
+      }
+    };
 
-    onMounted(async () => {
-      const data = await fetchMovies("/movie/popular");
-      movies.value = data.results;
+    onMounted(() => {
+      loadMovies();
     });
 
-    return { movies, getImageUrl };
+    return { movies };
   },
 });
 </script>
 
 <style scoped>
-.movie-list {
-  display: flex;
-  flex-wrap: wrap;
-}
-.movie-item {
+.movie {
   margin: 10px;
+  display: inline-block;
   text-align: center;
+}
+.movie img {
+  width: 200px;
+  height: auto;
+  border-radius: 10px;
 }
 </style>
