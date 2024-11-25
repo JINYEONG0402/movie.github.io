@@ -1,15 +1,30 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Login from "../components/Login.vue";
-import MovieHome from "../components/Home.vue";
-import MovieDetail from "../components/MovieDetail.vue";
-import SearchResults from "../components/SearchResults.vue";
+import SignIn from "@/components/Login.vue";
+import Home from "@/components/home/Home.vue";
+import HomeMain from "@/components/home/HomeMain.vue";
+import HomeWishlist from "@/components/WishList/HomeWishList.vue";
 
-// 라우트 설정
+// 라우트 정의
 const routes = [
-  { path: "/", name: "Login", component: Login },
-  { path: "/home", name: "Home", component: MovieHome },
-  { path: "/movie/:id", name: "MovieDetail", component: MovieDetail },
-  { path: "/search", name: "SearchResults", component: SearchResults },
+  {
+    path: "/",
+    component: Home,
+    meta: { requiresAuth: true }, // 인증이 필요한 라우트
+    children: [
+      {
+        path: "",
+        component: HomeMain,
+      },
+      {
+        path: "wishlist",
+        component: HomeWishlist,
+      },
+    ],
+  },
+  {
+    path: "/SignIn",
+    component: SignIn,
+  },
 ];
 
 // 라우터 생성
@@ -18,5 +33,17 @@ const router = createRouter({
   routes,
 });
 
-// 기본 내보내기
+// 전역 네비게이션 가드
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = localStorage.getItem("TMDb-Key") !== null;
+
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    // 인증이 필요한데 인증되지 않은 경우
+    next({ path: "/signIn" });
+  } else {
+    // 인증되어 있거나 인증이 필요하지 않은 경우
+    next();
+  }
+});
+
 export default router;

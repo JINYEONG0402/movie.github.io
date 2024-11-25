@@ -1,36 +1,38 @@
 <template>
-  <header class="app-header" :class="{ scrolled: isScrolled }">
-    <div class="header-left">
-      <div class="logo">
-        <router-link to="/">
-          <font-awesome-icon
-            :icon="['fas', 'ticket']"
-            style="color: #e50914"
-          ></font-awesome-icon>
-        </router-link>
+  <div id="container">
+    <header :class="['app-header', { scrolled: isScrolled }]">
+      <div class="header-left">
+        <div class="logo">
+          <router-link to="/">
+            <font-awesome-icon icon="ticket" style="color: #e50914" />
+          </router-link>
+        </div>
+        <nav class="nav-links desktop-nav">
+          <ul>
+            <li><router-link to="/">홈</router-link></li>
+            <li><router-link to="/popular">대세 콘텐츠</router-link></li>
+            <li><router-link to="/wishlist">내가 찜한 리스트</router-link></li>
+            <li><router-link to="/search">찾아보기</router-link></li>
+          </ul>
+        </nav>
       </div>
-      <nav class="nav-links desktop-nav">
-        <ul>
-          <li><router-link to="/">홈</router-link></li>
-          <li><router-link to="/popular">대세 콘텐츠</router-link></li>
-          <li><router-link to="/wishlist">내가 찜한 리스트</router-link></li>
-          <li><router-link to="/search">찾아보기</router-link></li>
-        </ul>
-      </nav>
-    </div>
-    <div class="header-right">
-      <button class="icon-button" @click="removeKey">
-        <font-awesome-icon :icon="['fas', 'user']" />
-      </button>
-      <button class="icon-button mobile-menu-button" @click="toggleMobileMenu">
-        <font-awesome-icon :icon="['fas', 'bars']" />
-      </button>
-    </div>
+      <div class="header-right">
+        <button class="icon-button" @click="removeKey">
+          <font-awesome-icon icon="user" />
+        </button>
+        <button
+          class="icon-button mobile-menu-button"
+          @click="toggleMobileMenu"
+        >
+          <font-awesome-icon icon="bars" />
+        </button>
+      </div>
+    </header>
 
     <!-- Mobile Navigation -->
     <div class="mobile-nav" :class="{ open: isMobileMenuOpen }">
       <button class="close-button" @click="toggleMobileMenu">
-        <font-awesome-icon :icon="['fas', 'times']" />
+        <font-awesome-icon icon="times" />
       </button>
       <nav>
         <ul>
@@ -55,21 +57,33 @@
         </ul>
       </nav>
     </div>
-  </header>
+  </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, onMounted, onUnmounted, ref } from "vue";
+<script>
+import { ref, onMounted, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import {
+  faSearch,
+  faUser,
+  faTicket,
+  faBars,
+  faTimes,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-export default defineComponent({
-  name: "Header",
+library.add(faSearch, faUser, faTicket, faBars, faTimes);
+
+export default {
+  name: "AppHeader",
   components: {
     FontAwesomeIcon,
   },
   setup() {
     const isScrolled = ref(false);
     const isMobileMenuOpen = ref(false);
+    const router = useRouter();
 
     const handleScroll = () => {
       isScrolled.value = window.scrollY > 50;
@@ -81,7 +95,7 @@ export default defineComponent({
 
     const removeKey = () => {
       localStorage.removeItem("TMDb-Key");
-      window.location.href = "/signin";
+      router.push("/signin");
     };
 
     onMounted(() => {
@@ -99,7 +113,7 @@ export default defineComponent({
       removeKey,
     };
   },
-});
+};
 </script>
 
 <style scoped>
@@ -118,10 +132,6 @@ export default defineComponent({
   transition: background-color 0.3s ease;
 }
 
-.app-header.scrolled {
-  background-color: #141414;
-}
-
 .header-left,
 .header-right {
   display: flex;
@@ -131,7 +141,7 @@ export default defineComponent({
 .logo {
   height: 30px;
   margin-right: 25px;
-  display: flex;
+  justify-items: center;
   align-items: center;
 }
 
