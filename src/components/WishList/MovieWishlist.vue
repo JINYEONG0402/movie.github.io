@@ -14,7 +14,12 @@
         >
           <img :src="getImageUrl(movie.poster_path)" :alt="movie.title" />
           <div class="movie-title">{{ movie.title }}</div>
-          <div class="wishlist-indicator">👍</div>
+          <div
+            class="wishlist-indicator"
+            :class="{ active: isMovieInWishlist(movie.id) }"
+          >
+            👍
+          </div>
         </div>
       </div>
     </div>
@@ -47,13 +52,11 @@ export default {
     const moviesPerPage = ref(20);
     const isMobile = ref(window.innerWidth <= 768);
 
-    const wishlist = new wishListService();
+    const wishlist = wishListService;
 
     const loadWishlist = () => {
-      wishlist.getWishlist().then((movies) => {
-        wishlistMovies.value = movies;
-        updateVisibleMovies();
-      });
+      wishlistMovies.value = wishlist.getCurrentWishlist();
+      updateVisibleMovies();
     };
 
     const getImageUrl = (path) =>
@@ -120,7 +123,12 @@ export default {
     };
 
     const toggleWishlist = (movie) => {
-      wishlist.toggleWishlist(movie).then(loadWishlist);
+      wishlist.toggleWishlist(movie);
+      loadWishlist();
+    };
+
+    const isMovieInWishlist = (movieId) => {
+      return wishlist.isInWishlist(movieId);
     };
 
     const handleResize = () => {
@@ -152,6 +160,7 @@ export default {
       nextPage,
       prevPage,
       toggleWishlist,
+      isMovieInWishlist,
     };
   },
 };

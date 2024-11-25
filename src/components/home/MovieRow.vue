@@ -1,5 +1,5 @@
 <template>
-  <div class="movie-row">
+  <div class="movie-row" v-if="!loading">
     <h2>{{ title }}</h2>
     <div class="slider-container">
       <div class="slider-window" ref="sliderWindow">
@@ -27,6 +27,9 @@
       </div>
     </div>
   </div>
+  <div v-else>
+    <p>Loading movies...</p>
+  </div>
 </template>
 
 <script lang="ts">
@@ -49,29 +52,37 @@ export default defineComponent({
   setup(props) {
     const movies = ref<any[]>([]);
     const scrollAmount = ref(0);
+    const loading = ref(true);
 
     const slider = ref<HTMLDivElement | null>(null);
     const sliderWindow = ref<HTMLDivElement | null>(null);
 
     const fetchMovies = async () => {
       try {
-        const response = await axios.get(props.fetchUrl);
-        console.log("API Response:", response.data.results);
-        movies.value = response.data.results;
+        const cachedMovies = localStorage.getItem("movies");
+        if (cachedMovies) {
+          movies.value = JSON.parse(cachedMovies);
+        } else {
+          const response = await axios.get(props.fetchUrl);
+          movies.value = response.data.results;
+          localStorage.setItem("movies", JSON.stringify(response.data.results));
+        }
       } catch (error) {
         console.error("Error fetching movies:", error);
+      } finally {
+        loading.value = false;
       }
     };
 
     const getImageUrl = (path: string | null | undefined): string => {
       return path
         ? `https://image.tmdb.org/t/p/w300${path}`
-        : "/default-image.jpg"; // 기본 이미지 경로
+        : "/default-image.jpg";
     };
 
     const handleImageError = (event: Event) => {
       const target = event.target as HTMLImageElement;
-      target.src = "/default-image.jpg"; // 기본 이미지 경로
+      target.src = "/default-image.jpg";
     };
 
     const toggleWishlist = (movie: any) => {
@@ -84,11 +95,13 @@ export default defineComponent({
 
     onMounted(() => {
       fetchMovies();
+      scrollAmount.value = 0;
     });
 
     return {
       movies,
       scrollAmount,
+      loading,
       getImageUrl,
       handleImageError,
       toggleWishlist,
