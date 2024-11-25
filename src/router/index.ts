@@ -1,26 +1,22 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import HomeView from "../views/HomeView.vue";
+import { createRouter, createWebHistory } from "vue-router";
+import Login from "../components/Login.vue";
+import Home from "../components/Home.vue";
+import MovieDetail from "../components/MovieDetail.vue";
+import SearchResults from "../components/SearchResults.vue";
 
-const routes: Array<RouteRecordRaw> = [
-  {
-    path: "/",
-    name: "home",
-    component: HomeView,
-  },
-  {
-    path: "/about",
-    name: "about",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/AboutView.vue"),
-  },
+// 라우트 설정
+const routes = [
+  { path: "/", name: "Login", component: Login },
+  { path: "/home", name: "Home", component: Home },
+  { path: "/movie/:id", name: "MovieDetail", component: MovieDetail },
+  { path: "/search", name: "SearchResults", component: SearchResults },
 ];
 
+// 라우터 생성
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(),
   routes,
 });
 
+// 기본 내보내기
 export default router;
