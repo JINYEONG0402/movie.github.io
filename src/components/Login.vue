@@ -15,7 +15,6 @@
                 @blur="blurInput('email')"
                 placeholder="Enter your email"
               />
-              <label for="email">Email</label>
             </div>
             <div
               class="input"
@@ -29,7 +28,6 @@
                 @blur="blurInput('password')"
                 placeholder="Enter your password"
               />
-              <label for="password">Password</label>
             </div>
             <div class="checkbox remember">
               <input type="checkbox" id="remember" v-model="rememberMe" />
@@ -66,7 +64,6 @@
                 @blur="blurInput('registerEmail')"
                 placeholder="Enter your email"
               />
-              <label for="register-email">Email</label>
             </div>
             <div
               class="input"
@@ -80,7 +77,6 @@
                 @blur="blurInput('registerPassword')"
                 placeholder="Enter your password"
               />
-              <label for="register-password">Password</label>
             </div>
             <div
               class="input"
@@ -94,7 +90,6 @@
                 @blur="blurInput('confirmPassword')"
                 placeholder="Confirm your password"
               />
-              <label for="confirm-password">Password 한번 더</label>
             </div>
             <div class="checkbox remember">
               <input type="checkbox" id="terms" v-model="acceptTerms" />
@@ -212,10 +207,10 @@ export default defineComponent({
     };
 
     const handleLogin = () => {
-      // Example validation: Check if email and password are not empty
       if (email.value && password.value) {
+        // Simulating a login success
         alert("로그인 성공!");
-        router.push({ name: "Home", params: { apiKey: password.value } });
+        router.push({ name: "Home", query: { apiKey: password.value } }); // Pass API key as a query parameter
       } else {
         alert("아이디와 비밀번호를 확인하세요.");
       }

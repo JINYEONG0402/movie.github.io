@@ -1,69 +1,82 @@
 <template>
-  <div>
-    <h1>Popular Movies</h1>
+  <div class="movie-home">
+    <h1>Welcome to Movie Homepage</h1>
     <div v-if="movies.length">
       <div v-for="movie in movies" :key="movie.id" class="movie">
         <img
           :src="`https://image.tmdb.org/t/p/w500${movie.poster_path}`"
           :alt="movie.title"
         />
-        <p>{{ movie.title }}</p>
+        <h3>{{ movie.title }}</h3>
       </div>
     </div>
-    <p v-else>Loading movies...</p>
+    <div v-else>
+      <p>Loading movies...</p>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from "vue";
-import axios from "axios";
+import { defineComponent, onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
+import router from "@/router";
 
 export default defineComponent({
-  name: "HomePage",
-  props: {
-    apiKey: {
-      type: String,
-      required: true,
-    },
-  },
-  setup(props) {
+  name: "MovieHome",
+  setup() {
+    const route = useRoute();
     const movies = ref([]);
+    const apiKey = route.query.apiKey as string;
 
-    const loadMovies = async () => {
+    const fetchMovies = async () => {
+      if (!apiKey) {
+        alert("API 키가 없습니다. 로그인 페이지로 이동합니다.");
+        await router.push({ name: "Login" });
+        return;
+      }
+
       try {
-        const response = await axios.get(
-          "https://api.themoviedb.org/3/movie/popular",
-          {
-            params: {
-              api_key: props.apiKey, // Use the passed API key
-            },
-          }
+        const response = await fetch(
+          `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=ko-KR&page=1`
         );
-        movies.value = response.data.results;
+        if (!response.ok) throw new Error("API 요청에 실패했습니다.");
+        const data = await response.json();
+        movies.value = data.results;
       } catch (error) {
-        console.error("Failed to fetch movies:", error);
-        alert("영화 데이터를 불러올 수 없습니다. API 키를 확인하세요.");
+        console.error("Error fetching movies:", error);
+        alert("API 키가 유효하지 않습니다. 다시 로그인 해주세요.");
+        await router.push({ name: "Login" });
       }
     };
 
-    onMounted(() => {
-      loadMovies();
-    });
+    onMounted(fetchMovies);
 
-    return { movies };
+    return {
+      movies,
+    };
   },
 });
 </script>
 
 <style scoped>
-.movie {
-  margin: 10px;
-  display: inline-block;
+.movie-home {
   text-align: center;
+  padding: 20px;
 }
-.movie img {
+
+.movie {
+  display: inline-block;
+  margin: 10px;
   width: 200px;
-  height: auto;
+}
+
+.movie img {
+  width: 100%;
   border-radius: 10px;
+}
+
+.movie h3 {
+  font-size: 16px;
+  margin-top: 10px;
 }
 </style>
