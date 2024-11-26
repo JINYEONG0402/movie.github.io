@@ -342,7 +342,7 @@ export default {
 }
 
 .top-button:hover {
-  background-color: #9b0f16;
+  background-color: rgba(204, 0, 255, 0.8);
   transform: scale(1.1);
 }
 

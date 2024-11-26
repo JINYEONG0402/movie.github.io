@@ -102,7 +102,7 @@ export default defineComponent({
   margin-top: 0;
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 20px;
 }
 
 .custom-select {

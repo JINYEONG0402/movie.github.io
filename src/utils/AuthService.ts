@@ -11,17 +11,17 @@ export class AuthService {
   /**
    * 사용자 로그인
    */
-  tryLogin(email: string, password: string): Promise<User> {
+  tryLogin(email: string, apiKey: string): Promise<User> {
     return new Promise((resolve, reject) => {
       const users: User[] = JSON.parse(localStorage.getItem("users") || "[]");
       const user = users.find(
-        (user) => user.id === email && user.password === password
+        (user) => user.id === email && user.apiKey === apiKey // API Key로 인증
       );
 
       if (user) {
         resolve(user); // 로그인 성공
       } else {
-        reject(new Error("Login failed. Please check your email or password."));
+        reject(new Error("Login failed. Please check your email or API key."));
       }
     });
   }

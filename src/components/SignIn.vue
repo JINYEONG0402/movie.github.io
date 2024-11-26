@@ -7,7 +7,7 @@
           <!-- 로그인 카드 -->
           <div :class="['card', { hidden: !isLoginVisible }]" id="login">
             <form @submit.prevent="handleLogin">
-              <h1>Sign in</h1>
+              <h1>로그인</h1>
               <div class="input" :class="{ active: isEmailFocused || email }">
                 <input
                   id="email"
@@ -18,23 +18,10 @@
                 />
                 <label for="email">Email</label>
               </div>
-              <div
-                class="input"
-                :class="{ active: isPasswordFocused || password }"
-              >
-                <input
-                  id="password"
-                  type="password"
-                  v-model="password"
-                  @focus="focusInput('password')"
-                  @blur="blurInput('password')"
-                />
-                <label for="password">Password</label>
-              </div>
               <div class="input" :class="{ active: isApiKeyFocused || apiKey }">
                 <input
                   id="api-key"
-                  type="text"
+                  type="password"
                   v-model="apiKey"
                   @focus="focusInput('apiKey')"
                   @blur="blurInput('apiKey')"
@@ -43,16 +30,17 @@
               </div>
               <span class="checkbox remember">
                 <input type="checkbox" id="remember" v-model="rememberMe" />
-                <label for="remember" class="read-text">Remember me</label>
+                <label for="remember" class="read-text">자동저장</label>
               </span>
               <button :disabled="!isLoginFormValid">Login</button>
             </form>
+            <!-- 회원가입으로 이동 -->
             <a
               href="javascript:void(0)"
               class="account-check"
               @click="toggleCard"
             >
-              Don't have an account? <b>Sign up</b>
+              가입 안하셨나요? <b>회원가입</b>
             </a>
           </div>
 
@@ -96,22 +84,21 @@
                   @focus="focusInput('apiKey')"
                   @blur="blurInput('apiKey')"
                 />
-                <label for="api-key">TMDB API Key</label>
+                <label for="api-key">한번 더 입력</label>
               </div>
               <span class="checkbox remember">
                 <input type="checkbox" id="terms" v-model="acceptTerms" />
-                <label for="terms" class="read-text">
-                  I have read <b>Terms and Conditions</b>
-                </label>
+                <label for="terms" class="read-text"> 동의하기 <b></b> </label>
               </span>
-              <button :disabled="!isRegisterFormValid">Register</button>
+              <button :disabled="!isRegisterFormValid">회원가입</button>
             </form>
+            <!-- 로그인으로 이동 -->
             <a
               href="javascript:void(0)"
               class="account-check"
               @click="toggleCard"
             >
-              Already have an account? <b>Sign in</b>
+              계정이 있으신가요? <b>로그인</b>
             </a>
           </div>
         </div>
@@ -126,9 +113,9 @@ import { useRouter } from "vue-router";
 import { authService } from "@/utils/AuthService";
 
 const router = useRouter();
-const isLoginVisible = ref(true);
+const isLoginVisible = ref(true); // 현재 카드 상태 (true: 로그인, false: 회원가입)
+
 const email = ref("");
-const password = ref("");
 const apiKey = ref("");
 const registerEmail = ref("");
 const registerPassword = ref("");
@@ -136,34 +123,31 @@ const rememberMe = ref(false);
 const acceptTerms = ref(false);
 
 const isEmailFocused = ref(false);
-const isPasswordFocused = ref(false);
+const isApiKeyFocused = ref(false);
 const isRegisterEmailFocused = ref(false);
 const isRegisterPasswordFocused = ref(false);
-const isApiKeyFocused = ref(false);
 
 const toggleCard = () => {
-  isLoginVisible.value = !isLoginVisible.value;
+  isLoginVisible.value = !isLoginVisible.value; // 카드 전환
 };
 
 const focusInput = (inputName) => {
   if (inputName === "email") isEmailFocused.value = true;
-  if (inputName === "password") isPasswordFocused.value = true;
+  if (inputName === "apiKey") isApiKeyFocused.value = true;
   if (inputName === "registerEmail") isRegisterEmailFocused.value = true;
   if (inputName === "registerPassword") isRegisterPasswordFocused.value = true;
-  if (inputName === "apiKey") isApiKeyFocused.value = true;
 };
 
 const blurInput = (inputName) => {
   if (inputName === "email") isEmailFocused.value = false;
-  if (inputName === "password") isPasswordFocused.value = false;
+  if (inputName === "apiKey") isApiKeyFocused.value = false;
   if (inputName === "registerEmail") isRegisterEmailFocused.value = false;
   if (inputName === "registerPassword") isRegisterPasswordFocused.value = false;
-  if (inputName === "apiKey") isApiKeyFocused.value = false;
 };
 
-const isLoginFormValid = computed(
-  () => email.value && password.value && apiKey.value
-);
+// 로그인 폼 유효성 검사
+const isLoginFormValid = computed(() => email.value && apiKey.value);
+// 회원가입 폼 유효성 검사
 const isRegisterFormValid = computed(
   () =>
     registerEmail.value &&
@@ -179,7 +163,7 @@ const handleLogin = async () => {
       alert("Invalid TMDB API Key");
       return;
     }
-    const user = await authService.tryLogin(email.value, password.value);
+    const user = await authService.tryLogin(email.value, apiKey.value);
     localStorage.setItem("TMDb-Key", apiKey.value);
     router.push("/");
   } catch (err) {
@@ -200,7 +184,7 @@ const handleRegister = async () => {
       apiKey.value
     );
     alert("Registration successful! Please log in.");
-    toggleCard();
+    toggleCard(); // 회원가입 후 로그인 페이지로 전환
   } catch (err) {
     alert(err.message);
   }
@@ -223,7 +207,7 @@ const handleRegister = async () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url("https://images.unsplash.com/photo-1507041957456-9c397ce39c97?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+  background-image: url("@/assets/designecologist-Pmh0UoG1vlE-unsplash.jpg");
   background-size: cover;
   background-position: center;
 }
@@ -234,7 +218,7 @@ const handleRegister = async () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(27, 27, 27, 0.9);
+  background-color: rgba(32, 0, 51, 0.9);
 }
 
 a {
@@ -244,7 +228,7 @@ a {
 }
 
 .container {
-  height: 100svh;
+  height: 80svh;
   width: 100svw;
   position: absolute;
   top: 0;
@@ -297,7 +281,7 @@ a {
 input {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #000;
+  color: #a7a7af;
   background-color: transparent;
   border: none;
   outline: none;
@@ -312,7 +296,7 @@ input {
   align-items: center;
   justify-content: center;
   text-indent: 10px; /* 원하는 들여쓰기 크기로 조정하세요 */
-  color: #2b2b2b !important;
+  color: #ffffff !important;
   font-weight: 900;
 }
 
@@ -322,7 +306,7 @@ h1 {
   text-align: center;
   margin-top: 0;
 
-  color: #272727;
+  color: #ffffff;
 }
 
 button {
@@ -330,17 +314,17 @@ button {
   border-radius: 50px;
   border: none;
   width: 100%;
-  background-color: #2069ff;
-  color: #fff;
+  background-color: rgba(242, 0, 255, 0.8);
+  color: rgb(255, 255, 255);
   padding: 17px;
   text-transform: uppercase;
   letter-spacing: 2px;
-  box-shadow: 0 10px 30px rgba(23, 83, 209, 0.3);
+  box-shadow: 0 10px 30px rgba(97, 23, 209, 0.3);
   transition: all 0.2s ease;
 }
 
 button:hover {
-  box-shadow: 0 2px 10px rgba(23, 83, 209, 0.4);
+  box-shadow: 0 2px 10px rgba(119, 23, 209, 0.4);
 }
 
 .input {
@@ -349,8 +333,8 @@ button:hover {
 }
 
 .line-active {
-  border-bottom: 1px solid #2069ff !important;
-  box-shadow: 0 1px 0 #2069ff !important;
+  border-bottom: 1px solid rgba(32, 0, 51, 0.9) !important;
+  box-shadow: 0 1px 0 rgba(119, 23, 209, 0.4) !important;
 }
 
 .input input {
@@ -390,7 +374,7 @@ button:hover {
 }
 
 .label-blue {
-  color: #2069ff !important;
+  color: rgba(242, 0, 255, 0.8) !important;
 }
 
 [type="checkbox"]:not(:checked),
@@ -438,8 +422,8 @@ button:hover {
   height: 22px;
   border-top: 2px solid transparent;
   border-left: 2px solid transparent;
-  border-right: 2px solid #2069ff;
-  border-bottom: 2px solid #2069ff;
+  border-right: 2px solid rgba(242, 0, 255, 0.8);
+  border-bottom: 2px solid rgba(242, 0, 255, 0.8);
   transform: rotate(40deg);
   backface-visibility: hidden;
   transform-origin: 100% 100%;
@@ -472,9 +456,9 @@ button:hover {
   width: 100%;
   max-width: 800px;
   position: absolute;
-  background-color: white;
+  background-color: #000000;
   padding: 27px 30px 46px 30px;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 5px 10px rgb(255, 53, 232);
   transition: all 0.4s 0.1s ease;
 
   top: 50%;
@@ -507,7 +491,7 @@ button:hover {
   opacity: 0;
   text-decoration: none;
   visibility: hidden;
-  color: #fff;
+  color: #ffffff;
   padding: 10px;
   transition: all 0.2s ease;
 }
@@ -528,8 +512,8 @@ button:hover {
 }
 
 .card.hidden {
-  background-color: #2069ff;
-  box-shadow: 0 20px 40px rgba(23, 83, 209, 0.8);
+  background-color: rgba(242, 0, 255, 0.8);
+  box-shadow: 0 20px 40px rgb(115, 2, 102);
   padding: 0 30px 0 30px;
 }
 
