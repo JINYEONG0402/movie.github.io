@@ -1,13 +1,14 @@
 import axios from "axios";
+import { Movie } from "@/type/type"; // Movie 타입 가져오기
 
 export class URLService {
-  async fetchFeaturedMovie(apiKey: string): Promise<any> {
+  async fetchFeaturedMovie(apiKey: string): Promise<Movie> {
     try {
       const response = await axios.get(
         `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=ko-KR`
       );
       console.log(response.data.results[0]);
-      return response.data.results[0];
+      return response.data.results[0] as Movie;
     } catch (error) {
       console.error("Error fetching featured movie:", error);
       throw error; // 에러를 호출한 쪽에서 처리할 수 있도록 다시 던짐

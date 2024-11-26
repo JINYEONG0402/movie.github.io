@@ -38,14 +38,14 @@ export default {
 
 <style scoped>
 .banner {
-  height: 60vh;
-  max-width: 95svw;
+  height: 70vh;
+  max-width: 100svw;
   background-size: cover;
   background-position: center;
-  color: white;
+  color: #ffffff;
   display: flex;
   align-items: flex-end;
-  margin-top: 50px;
+  margin-top: 5px;
 }
 
 .banner-content {

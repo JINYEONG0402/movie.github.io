@@ -32,18 +32,17 @@ export default defineComponent({
     const sortId = ref("all");
 
     const genreCode = {
-      "장 르": 0,
-      Action: 28,
-      Adventure: 12,
-      Comedy: 35,
-      Crime: 80,
-      Family: 10751,
+      "장르 (전체)": 0,
+      "액 션": 28,
+      "판타지, 모험": 12,
+      "코 미디": 35,
+      "공 포": 80,
+      "가 족": 10751,
     };
-
     const sortingCode = {
       "언 어": "all",
-      English: "en",
-      Korean: "ko",
+      En: "en",
+      Ko: "ko",
     };
 
     const ageCode = {
@@ -58,9 +57,9 @@ export default defineComponent({
     };
 
     const changeOptions = (options) => {
-      genreId.value = `${genreCode[options.originalLanguage]}`;
-      ageId.value = ageCode[options.translationLanguage];
-      sortId.value = sortingCode[options.sorting];
+      genreId.value = genreCode[options.originalLanguage] || 0; // 매핑되지 않을 경우 기본값 사용
+      ageId.value = ageCode[options.translationLanguage] || -1;
+      sortId.value = sortingCode[options.sorting] || "all";
     };
 
     return {

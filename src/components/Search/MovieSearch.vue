@@ -40,7 +40,7 @@ export default defineComponent({
         "장르 (전체)",
         "액 션",
         "판타지, 모험",
-        "코미디",
+        "코 미디",
         "공 포",
         "가 족",
       ],
@@ -54,7 +54,7 @@ export default defineComponent({
         "4~5",
         "4점 이하",
       ],
-      sorting: ["언 어", "영어", "한국어"],
+      sorting: ["언 어", "En", "Ko"],
     };
 
     const selectedOptions = ref({ ...DEFAULT_OPTIONS });

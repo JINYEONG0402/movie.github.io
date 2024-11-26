@@ -4,7 +4,10 @@
       <div class="header-left">
         <div class="logo">
           <router-link to="/">
-            <font-awesome-icon icon="ticket" style="color: #e50914" />
+            <font-awesome-icon
+              icon="cube"
+              style="color: rgba(242, 0, 255, 0.8)"
+            />
           </router-link>
         </div>
         <nav class="nav-links desktop-nav">
@@ -68,13 +71,14 @@ import {
   faSearch,
   faUser,
   faTicket,
+  faCube,
   faBars,
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 // 아이콘 등록
-library.add(faSearch, faUser, faTicket, faBars, faTimes);
+library.add(faSearch, faUser, faCube, faTicket, faBars, faTimes);
 
 export default {
   name: "AppHeader",
@@ -141,9 +145,10 @@ export default {
 
 .logo {
   height: 30px;
-  margin-right: 25px;
+  margin-right: 30px;
   justify-items: center;
   align-items: center;
+  font-size: 1.5rem; /* 크기 조정 */
 }
 
 .nav-links ul {

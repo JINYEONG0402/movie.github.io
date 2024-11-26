@@ -1,8 +1,15 @@
 <template>
-  <div class="movie-row" v-if="!loading">
-    <h2>{{ title }}</h2>
-    <div class="slider-container">
-      <!-- 슬라이더 좌우 버튼 -->
+  <div class="movie-row">
+    <!-- 제목 -->
+    <h2 v-if="!loading">{{ title }}</h2>
+
+    <div v-if="loading" class="loading-indicator">
+      <p>Loading movies...</p>
+    </div>
+
+    <!-- 슬라이더 -->
+    <div v-else-if="movies.length > 0" class="slider-container">
+      <!-- 좌측 버튼 -->
       <button
         class="slider-button left"
         @click="scrollLeft"
@@ -10,6 +17,8 @@
       >
         ◀
       </button>
+
+      <!-- 영화 슬라이더 -->
       <div class="slider-window" ref="sliderWindow">
         <div
           class="movie-slider"
@@ -25,7 +34,7 @@
           >
             <img
               :src="getImageUrl(movie.poster_path)"
-              :alt="movie.title"
+              :alt="movie.title || 'No title available'"
               @error="handleImageError"
             />
             <!-- 위시리스트 표시 -->
@@ -35,6 +44,8 @@
           </div>
         </div>
       </div>
+
+      <!-- 우측 버튼 -->
       <button
         class="slider-button right"
         @click="scrollRight"
@@ -43,9 +54,11 @@
         ▶
       </button>
     </div>
-  </div>
-  <div v-else>
-    <p>Loading movies...</p>
+
+    <!-- 영화 데이터가 없을 때 -->
+    <div v-else>
+      <p>No movies available. Please try again later.</p>
+    </div>
   </div>
 </template>
 
@@ -53,7 +66,7 @@
 import { defineComponent, ref, onMounted, computed } from "vue";
 import axios from "axios";
 import { wishListService } from "@/utils/WishList";
-import { Movie } from "@/type/type"; // 타입 임포트
+import { Movie } from "@/type/type";
 
 export default defineComponent({
   name: "MovieRow",
@@ -68,14 +81,14 @@ export default defineComponent({
     },
   },
   setup(props) {
-    // `movies` 배열의 타입을 `Movie[]`로 지정
-    const movies = ref<Movie[]>([]);
-    const scrollAmount = ref(0);
-    const loading = ref(true);
+    const movies = ref<Movie[]>([]); // 영화 데이터
+    const scrollAmount = ref(0); // 슬라이더 스크롤 양
+    const loading = ref(true); // 로딩 상태
 
     const slider = ref<HTMLDivElement | null>(null);
     const sliderWindow = ref<HTMLDivElement | null>(null);
 
+    // 슬라이더 방향 버튼 활성화 여부
     const canScrollLeft = computed(() => scrollAmount.value > 0);
     const canScrollRight = computed(() => {
       if (slider.value && sliderWindow.value) {
@@ -86,36 +99,43 @@ export default defineComponent({
       return false;
     });
 
+    // 영화 데이터 가져오기
     const fetchMovies = async () => {
       try {
         const response = await axios.get(props.fetchUrl);
-        movies.value = response.data.results as Movie[]; // API 응답을 `Movie[]` 타입으로 캐스팅
+        movies.value = response.data.results || []; // 데이터 배열 초기화
       } catch (error) {
         console.error("Error fetching movies:", error);
+        movies.value = []; // 실패 시 빈 배열로 초기화
       } finally {
         loading.value = false;
       }
     };
 
+    // 이미지 URL 생성
     const getImageUrl = (path: string | null | undefined): string => {
       return path
         ? `https://image.tmdb.org/t/p/w300${path}`
         : "/default-image.jpg";
     };
 
+    // 이미지 로딩 실패 핸들러
     const handleImageError = (event: Event) => {
       const target = event.target as HTMLImageElement;
       target.src = "/default-image.jpg";
     };
 
+    // 위시리스트 토글
     const toggleWishlist = (movie: Movie) => {
       wishListService.toggleWishlist(movie);
     };
 
+    // 위시리스트 확인
     const isInWishlist = (movieId: number): boolean => {
       return wishListService.isInWishlist(movieId);
     };
 
+    // 슬라이더 왼쪽으로 이동
     const scrollLeft = () => {
       if (sliderWindow.value) {
         const windowWidth = sliderWindow.value.clientWidth;
@@ -123,6 +143,7 @@ export default defineComponent({
       }
     };
 
+    // 슬라이더 오른쪽으로 이동
     const scrollRight = () => {
       if (slider.value && sliderWindow.value) {
         const windowWidth = sliderWindow.value.clientWidth;
@@ -134,6 +155,7 @@ export default defineComponent({
       }
     };
 
+    // 컴포넌트 마운트 시 영화 데이터 가져오기
     onMounted(() => {
       fetchMovies();
       scrollAmount.value = 0;
@@ -157,6 +179,12 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.loading-indicator {
+  text-align: center;
+  padding: 20px;
+  color: white;
+}
+
 .wishlist-indicator {
   position: absolute;
   top: 5px;
@@ -178,6 +206,7 @@ export default defineComponent({
 .movie-row h2 {
   text-align: left;
   margin-left: 30px;
+  color: white;
 }
 
 .slider-container {

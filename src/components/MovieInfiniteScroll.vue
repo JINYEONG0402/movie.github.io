@@ -70,7 +70,7 @@ export default {
     const isLoading = ref(false);
     const hasMore = ref(true);
     const currentView = ref("grid");
-    const showTopButton = ref(false);
+    const showTopButton = ref(false); // 초기값 false
     const gridContainer = ref(null);
     const wishlist = ref([]);
     let observer;
@@ -92,7 +92,16 @@ export default {
         };
 
         if (props.genreCode !== "0") {
-          params.with_genres = props.genreCode;
+          params.with_genres = props.genreCode; // 장르 필터 추가
+        }
+
+        if (props.voteEverAge > 0) {
+          params["vote_average.gte"] = props.voteEverAge; // 평점 필터 추가
+          params["vote_average.lte"] = props.voteEverAge + 1; // 최대값 설정
+        }
+
+        if (props.sortingOrder !== "all") {
+          params.with_original_language = props.sortingOrder; // 언어 필터 추가
         }
 
         const response = await axios.get(url, { params });
@@ -134,17 +143,29 @@ export default {
       } else {
         wishlist.value.push(movie.id);
       }
+      console.log("Current Wishlist:", wishlist.value); // 찜 상태 확인
     };
 
     const isInWishlist = (movieId) => wishlist.value.includes(movieId);
 
     const handleScroll = () => {
-      const scrollTop = gridContainer.value.scrollTop;
-      showTopButton.value = scrollTop > 300;
+      const container = gridContainer.value;
+      if (container) {
+        const scrollTop = container.scrollTop;
+        showTopButton.value = scrollTop > 300; // 300px 이상 스크롤 시 버튼 표시
+      }
     };
 
     const scrollToTopAndReset = () => {
-      gridContainer.value.scrollTop({ top: 0, behavior: "smooth" });
+      const container = gridContainer.value;
+      if (container) {
+        container.scrollTo({
+          top: 0,
+          behavior: "smooth", // 부드러운 스크롤
+        });
+      }
+
+      // 데이터 초기화 및 재로드
       movies.value = [];
       currentPage.value = 1;
       hasMore.value = true;
@@ -161,16 +182,24 @@ export default {
         { root: gridContainer.value, rootMargin: "100px", threshold: 0.1 }
       );
 
-      observer.observe(gridContainer.value);
+      if (gridContainer.value) {
+        observer.observe(gridContainer.value.querySelector(".loading-trigger"));
+      }
     };
 
     onMounted(() => {
       fetchMovies();
       setupObserver();
+      if (gridContainer.value) {
+        gridContainer.value.addEventListener("scroll", handleScroll);
+      }
     });
 
     onUnmounted(() => {
-      observer.disconnect();
+      if (observer) observer.disconnect();
+      if (gridContainer.value) {
+        gridContainer.value.removeEventListener("scroll", handleScroll);
+      }
     });
 
     return {
@@ -196,6 +225,8 @@ export default {
   width: 100%;
   margin-bottom: 40px;
   margin-top: 30px;
+  overflow-y: auto;
+  height: 80vh;
   display: flex;
   flex-direction: column;
 }
@@ -257,7 +288,7 @@ export default {
   top: -10px;
   right: -10px;
   font-size: 30px;
-  background-color: rgba(229, 9, 20, 0.5);
+  background-color: rgba(242, 0, 255, 0.8);
   padding: 5px;
   border-radius: 50%;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
@@ -268,6 +299,7 @@ export default {
   height: 20px;
   margin-top: 20px;
   text-align: center;
+  display: block;
 }
 
 .loading-indicator {
@@ -292,7 +324,7 @@ export default {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background-color: #e50914;
+  background-color: rgba(242, 0, 255, 0.8);
   color: white;
   border: none;
   border-radius: 50%;
@@ -346,7 +378,6 @@ export default {
     top: -5px;
     right: -5px;
   }
-
   .top-button {
     width: 40px;
     height: 40px;

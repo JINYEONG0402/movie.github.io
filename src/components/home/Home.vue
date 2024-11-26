@@ -24,11 +24,10 @@ export default defineComponent({
 
 <style scoped>
 #app {
-  width: 95svw;
+  width: 94svw;
   height: 95svh;
   overflow-x: hidden;
-  margin: auto;
-  background-color: #2e2e2e;
+  margin: 5px;
 }
 #container {
   padding: 20px;

@@ -76,7 +76,6 @@ export default {
 }
 
 body {
-  background-color: #141414;
   overflow-y: scroll;
 }
 </style>
