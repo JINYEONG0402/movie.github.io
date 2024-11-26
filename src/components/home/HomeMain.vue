@@ -1,9 +1,9 @@
 <template>
   <div class="home">
     <Banner :movie="featuredMovie" />
-    <MovieRow title="Popular Movies" :fetchUrl="popularMoviesUrl" />
-    <MovieRow title="New Releases" :fetchUrl="newReleasesUrl" />
-    <MovieRow title="Action Movies" :fetchUrl="actionMoviesUrl" />
+    <MovieRow title="인기영화" :fetchUrl="popularMoviesUrl" />
+    <MovieRow title="신작" :fetchUrl="newReleasesUrl" />
+    <MovieRow title="액션영화" :fetchUrl="actionMoviesUrl" />
   </div>
 </template>
 
@@ -18,7 +18,11 @@ export default {
   components: { Banner, MovieRow },
   setup() {
     const apiKey = localStorage.getItem("TMDb-Key");
-    const featuredMovie = ref(null);
+    const featuredMovie = ref({
+      title: "",
+      overview: "",
+      backdrop_path: "",
+    });
     const popularMoviesUrl = ref("");
     const newReleasesUrl = ref("");
     const actionMoviesUrl = ref("");

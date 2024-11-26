@@ -4,7 +4,7 @@
     <div class="slider-container">
       <!-- 슬라이더 좌우 버튼 -->
       <button
-        class="slider-btn left-btn"
+        class="slider-button left"
         @click="scrollLeft"
         v-if="canScrollLeft"
       >
@@ -36,7 +36,7 @@
         </div>
       </div>
       <button
-        class="slider-btn right-btn"
+        class="slider-button right"
         @click="scrollRight"
         v-if="canScrollRight"
       >
@@ -53,6 +53,7 @@
 import { defineComponent, ref, onMounted, computed } from "vue";
 import axios from "axios";
 import { wishListService } from "@/utils/WishList";
+import { Movie } from "@/type/type"; // 타입 임포트
 
 export default defineComponent({
   name: "MovieRow",
@@ -67,7 +68,8 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const movies = ref<any[]>([]);
+    // `movies` 배열의 타입을 `Movie[]`로 지정
+    const movies = ref<Movie[]>([]);
     const scrollAmount = ref(0);
     const loading = ref(true);
 
@@ -77,8 +79,8 @@ export default defineComponent({
     const canScrollLeft = computed(() => scrollAmount.value > 0);
     const canScrollRight = computed(() => {
       if (slider.value && sliderWindow.value) {
-        const sliderWidth = slider.value.scrollWidth;
-        const windowWidth = sliderWindow.value.clientWidth;
+        const sliderWidth = slider.value.scrollWidth || 0;
+        const windowWidth = sliderWindow.value.clientWidth || 0;
         return scrollAmount.value + windowWidth < sliderWidth;
       }
       return false;
@@ -86,25 +88,8 @@ export default defineComponent({
 
     const fetchMovies = async () => {
       try {
-        if (!props.fetchUrl) {
-          console.error("Invalid or missing fetchUrl.");
-          return;
-        }
-
-        const apiKey = localStorage.getItem("TMDb-Key");
-        if (!apiKey) {
-          console.error("API Key is missing. Please log in.");
-          return;
-        }
-
-        const response = await axios.get(`${props.fetchUrl}&api_key=${apiKey}`);
-        movies.value = response.data.results;
-
-        // 데이터 캐싱
-        localStorage.setItem(
-          `movies_${props.title}`,
-          JSON.stringify(response.data.results)
-        );
+        const response = await axios.get(props.fetchUrl);
+        movies.value = response.data.results as Movie[]; // API 응답을 `Movie[]` 타입으로 캐스팅
       } catch (error) {
         console.error("Error fetching movies:", error);
       } finally {
@@ -123,7 +108,7 @@ export default defineComponent({
       target.src = "/default-image.jpg";
     };
 
-    const toggleWishlist = (movie: any) => {
+    const toggleWishlist = (movie: Movie) => {
       wishListService.toggleWishlist(movie);
     };
 
@@ -244,7 +229,7 @@ export default defineComponent({
 }
 
 .slider-button:hover {
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(242, 0, 255, 0.8);
 }
 
 .slider-button.left {

@@ -18,9 +18,13 @@ const routes = [
         component: HomeMain,
       },
       {
-        path: "",
+        path: "wishlist",
         name: "HomeWish",
         component: HomeWish,
+      },
+      {
+        path: "/Search",
+        component: Search,
       },
     ],
   },
@@ -30,14 +34,24 @@ const routes = [
     component: SignIn,
   },
   {
-    path: "/Search",
-    component: Search,
+    path: "/:catchAll(.*)",
+    redirect: "/",
   },
 ];
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = !!localStorage.getItem("authToken"); // 로그인 여부 확인
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    // 인증이 필요한 라우트에 접근 시 로그인 페이지로 이동
+    next({ path: "/signIn" });
+  } else {
+    next();
+  }
 });
 
 export default router;

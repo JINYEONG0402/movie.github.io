@@ -11,6 +11,9 @@
       <button class="info-btn title-btn">상세 정보</button>
     </div>
   </div>
+  <div v-else>
+    <p>Loading banner...</p>
+  </div>
 </template>
 
 <script>
@@ -19,7 +22,8 @@ export default {
   props: {
     movie: {
       type: Object,
-      required: true,
+      required: false, // 필수로 설정하지 않음
+      default: () => null, // 기본값으로 `null`을 설정
     },
   },
   computed: {
