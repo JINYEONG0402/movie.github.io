@@ -26,7 +26,7 @@
                   @focus="focusInput('apiKey')"
                   @blur="blurInput('apiKey')"
                 />
-                <label for="api-key">TMDB API Key</label>
+                <label for="api-key">Password</label>
               </div>
               <span class="checkbox remember">
                 <input type="checkbox" id="remember" v-model="rememberMe" />
@@ -40,7 +40,7 @@
               class="account-check"
               @click="toggleCard"
             >
-              가입 안하셨나요? <b>회원가입</b>
+              계정이 있으신가요? <b>로그인</b>
             </a>
           </div>
 
@@ -98,7 +98,7 @@
               class="account-check"
               @click="toggleCard"
             >
-              계정이 있으신가요? <b>로그인</b>
+              가입하셨나요? <b>회원가입</b>
             </a>
           </div>
         </div>
