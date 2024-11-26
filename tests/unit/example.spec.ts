@@ -2,13 +2,14 @@ import { mount } from "@vue/test-utils";
 import App from "@/App.vue";
 
 describe("App.vue", () => {
-  it("앱이 생성되어야 한다.", () => {
+  it("should render the app", () => {
     const wrapper = mount(App);
-    expect(wrapper.exists()).toBeTruthy();
+    expect(wrapper.exists()).toBe(true);
   });
 
-  it("올바른 제목을 렌더링해야 한다.", () => {
+  it("should render the title", () => {
     const wrapper = mount(App);
-    expect(wrapper.html()).toContain('<div id="app">');
+    const title = wrapper.find("h1");
+    expect(title.text()).toContain("Hello, Vue App");
   });
 });

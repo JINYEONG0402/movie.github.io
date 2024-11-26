@@ -1,59 +1,73 @@
+import axios from "axios";
+
+// 사용자 타입 정의
+interface User {
+  id: string;
+  password: string;
+  apiKey: string;
+}
+
 export class AuthService {
   /**
-   * Try to log in a user with the provided email and password.
-   * @param email - User's email address
-   * @param password - User's password
-   * @param saveToken - Whether to save the authentication token
-   * @returns A promise that resolves with the user object if login is successful, otherwise rejects with an error.
+   * 사용자 로그인
    */
-  tryLogin(email: string, password: string, saveToken = true): Promise<any> {
+  tryLogin(email: string, password: string): Promise<User> {
     return new Promise((resolve, reject) => {
-      const users = JSON.parse(localStorage.getItem("users") || "[]");
+      const users: User[] = JSON.parse(localStorage.getItem("users") || "[]");
       const user = users.find(
-        (user: any) => user.id === email && user.password === password
+        (user) => user.id === email && user.password === password
       );
 
       if (user) {
-        if (saveToken) {
-          localStorage.setItem("TMDb-Key", user.password);
-        }
         resolve(user); // 로그인 성공
       } else {
-        reject(new Error("Login failed")); // 로그인 실패
+        reject(new Error("Login failed. Please check your email or password."));
       }
     });
   }
 
   /**
-   * Register a new user with the provided email and password.
-   * @param email - User's email address
-   * @param password - User's password
-   * @returns A promise that resolves when the user is successfully registered, otherwise rejects with an error.
+   * 사용자 회원가입
    */
-  tryRegister(email: string, password: string): Promise<void> {
+  tryRegister(email: string, password: string, apiKey: string): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
-        const users = JSON.parse(localStorage.getItem("users") || "[]");
+        const users: User[] = JSON.parse(localStorage.getItem("users") || "[]");
+
         const userExists = users.some(
-          (existingUser: any) => existingUser.id === email
+          (existingUser) => existingUser.id === email
         );
 
         if (userExists) {
-          throw new Error("User already exists");
+          return reject(new Error("User already exists"));
         }
 
-        const newUser = { id: email, password: password };
+        const newUser: User = { id: email, password: password, apiKey: apiKey };
         users.push(newUser);
         localStorage.setItem("users", JSON.stringify(users));
-        resolve(); // 회원가입 성공
+        resolve();
       } catch (err) {
-        reject(
+        return reject(
           err instanceof Error ? err.message : "An unknown error occurred"
-        ); // 회원가입 실패
+        );
       }
     });
   }
+
+  /**
+   * TMDB API Key 유효성 검사
+   */
+  async validateApiKey(apiKey: string): Promise<boolean> {
+    try {
+      const response = await axios.get(
+        `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}`
+      );
+      return response.status === 200;
+    } catch (error) {
+      console.error("API Key validation failed:", error);
+      return false;
+    }
+  }
 }
 
-// Export a single instance of AuthService
 export const authService = new AuthService();

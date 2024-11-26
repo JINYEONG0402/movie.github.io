@@ -2,12 +2,21 @@
   <div class="movie-row" v-if="!loading">
     <h2>{{ title }}</h2>
     <div class="slider-container">
+      <!-- 슬라이더 좌우 버튼 -->
+      <button
+        class="slider-btn left-btn"
+        @click="scrollLeft"
+        v-if="canScrollLeft"
+      >
+        ◀
+      </button>
       <div class="slider-window" ref="sliderWindow">
         <div
           class="movie-slider"
           ref="slider"
           :style="{ transform: `translateX(-${scrollAmount}px)` }"
         >
+          <!-- 영화 카드 -->
           <div
             v-for="movie in movies"
             :key="movie.id"
@@ -19,12 +28,20 @@
               :alt="movie.title"
               @error="handleImageError"
             />
+            <!-- 위시리스트 표시 -->
             <div v-if="isInWishlist(movie.id)" class="wishlist-indicator">
               👍
             </div>
           </div>
         </div>
       </div>
+      <button
+        class="slider-btn right-btn"
+        @click="scrollRight"
+        v-if="canScrollRight"
+      >
+        ▶
+      </button>
     </div>
   </div>
   <div v-else>
@@ -33,7 +50,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch, nextTick } from "vue";
+import { defineComponent, ref, onMounted, computed } from "vue";
 import axios from "axios";
 import { wishListService } from "@/utils/WishList";
 
@@ -57,16 +74,37 @@ export default defineComponent({
     const slider = ref<HTMLDivElement | null>(null);
     const sliderWindow = ref<HTMLDivElement | null>(null);
 
+    const canScrollLeft = computed(() => scrollAmount.value > 0);
+    const canScrollRight = computed(() => {
+      if (slider.value && sliderWindow.value) {
+        const sliderWidth = slider.value.scrollWidth;
+        const windowWidth = sliderWindow.value.clientWidth;
+        return scrollAmount.value + windowWidth < sliderWidth;
+      }
+      return false;
+    });
+
     const fetchMovies = async () => {
       try {
-        const cachedMovies = localStorage.getItem("movies");
-        if (cachedMovies) {
-          movies.value = JSON.parse(cachedMovies);
-        } else {
-          const response = await axios.get(props.fetchUrl);
-          movies.value = response.data.results;
-          localStorage.setItem("movies", JSON.stringify(response.data.results));
+        if (!props.fetchUrl) {
+          console.error("Invalid or missing fetchUrl.");
+          return;
         }
+
+        const apiKey = localStorage.getItem("TMDb-Key");
+        if (!apiKey) {
+          console.error("API Key is missing. Please log in.");
+          return;
+        }
+
+        const response = await axios.get(`${props.fetchUrl}&api_key=${apiKey}`);
+        movies.value = response.data.results;
+
+        // 데이터 캐싱
+        localStorage.setItem(
+          `movies_${props.title}`,
+          JSON.stringify(response.data.results)
+        );
       } catch (error) {
         console.error("Error fetching movies:", error);
       } finally {
@@ -93,6 +131,24 @@ export default defineComponent({
       return wishListService.isInWishlist(movieId);
     };
 
+    const scrollLeft = () => {
+      if (sliderWindow.value) {
+        const windowWidth = sliderWindow.value.clientWidth;
+        scrollAmount.value = Math.max(0, scrollAmount.value - windowWidth);
+      }
+    };
+
+    const scrollRight = () => {
+      if (slider.value && sliderWindow.value) {
+        const windowWidth = sliderWindow.value.clientWidth;
+        const sliderWidth = slider.value.scrollWidth;
+        scrollAmount.value = Math.min(
+          scrollAmount.value + windowWidth,
+          sliderWidth
+        );
+      }
+    };
+
     onMounted(() => {
       fetchMovies();
       scrollAmount.value = 0;
@@ -106,6 +162,10 @@ export default defineComponent({
       handleImageError,
       toggleWishlist,
       isInWishlist,
+      scrollLeft,
+      scrollRight,
+      canScrollLeft,
+      canScrollRight,
     };
   },
 });

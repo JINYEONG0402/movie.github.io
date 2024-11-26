@@ -15,7 +15,7 @@
 
 <script>
 export default {
-  name: "AppBanner",
+  name: "Banner",
   props: {
     movie: {
       type: Object,
@@ -24,7 +24,7 @@ export default {
   },
   computed: {
     backdropUrl() {
-      return this.movie
+      return this.movie?.backdrop_path
         ? `https://image.tmdb.org/t/p/original${this.movie.backdrop_path}`
         : "";
     },

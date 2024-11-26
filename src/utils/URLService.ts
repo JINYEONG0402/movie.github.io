@@ -1,24 +1,16 @@
 import axios from "axios";
 
-interface Movie {
-  id: number;
-  title: string;
-  overview: string;
-  backdrop_path: string;
-  [key: string]: any;
-}
-
-class URLService {
-  async fetchFeaturedMovie(apiKey: string): Promise<Movie> {
+export class URLService {
+  async fetchFeaturedMovie(apiKey: string): Promise<any> {
     try {
       const response = await axios.get(
         `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=ko-KR`
       );
       console.log(response.data.results[0]);
-      return response.data.results[0] as Movie;
+      return response.data.results[0];
     } catch (error) {
       console.error("Error fetching featured movie:", error);
-      throw error;
+      throw error; // 에러를 호출한 쪽에서 처리할 수 있도록 다시 던짐
     }
   }
 
@@ -35,5 +27,5 @@ class URLService {
   }
 }
 
-// Export a single instance of the URLService class
+// Export 단일 인스턴스
 export const urlService = new URLService();

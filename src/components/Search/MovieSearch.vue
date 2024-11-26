@@ -1,6 +1,5 @@
 <template>
   <div class="dropdown-container">
-    <label>선호하는 설정을 선택하세요</label>
     <div
       v-for="dropdown in dropdownEntries"
       :key="dropdown.key"
@@ -31,22 +30,22 @@ export default defineComponent({
   emits: ["changeOptions"],
   setup(_, { emit }) {
     const DEFAULT_OPTIONS = {
-      originalLanguage: "장르 (전체)",
-      translationLanguage: "평점 (전체)",
-      sorting: "언어 (전체)",
+      originalLanguage: "장 르",
+      translationLanguage: "평 점",
+      sorting: "언 어",
     };
 
     const dropdowns = {
       originalLanguage: [
         "장르 (전체)",
-        "Action",
-        "Adventure",
-        "Comedy",
-        "Crime",
-        "Family",
+        "액 션",
+        "판타지, 모험",
+        "코미디",
+        "공 포",
+        "가 족",
       ],
       translationLanguage: [
-        "평점 (전체)",
+        "평 점",
         "9~10",
         "8~9",
         "7~8",
@@ -55,7 +54,7 @@ export default defineComponent({
         "4~5",
         "4점 이하",
       ],
-      sorting: ["언어 (전체)", "영어", "한국어"],
+      sorting: ["언 어", "영어", "한국어"],
     };
 
     const selectedOptions = ref({ ...DEFAULT_OPTIONS });

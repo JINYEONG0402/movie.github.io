@@ -73,6 +73,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
+// 아이콘 등록
 library.add(faSearch, faUser, faTicket, faBars, faTimes);
 
 export default {

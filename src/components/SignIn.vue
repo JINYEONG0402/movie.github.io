@@ -4,7 +4,7 @@
     <div class="container">
       <div id="phone">
         <div id="content-wrapper">
-          <!-- Login Card -->
+          <!-- 로그인 카드 -->
           <div :class="['card', { hidden: !isLoginVisible }]" id="login">
             <form @submit.prevent="handleLogin">
               <h1>Sign in</h1>
@@ -16,7 +16,7 @@
                   @focus="focusInput('email')"
                   @blur="blurInput('email')"
                 />
-                <label for="email">Username or Email</label>
+                <label for="email">Email</label>
               </div>
               <div
                 class="input"
@@ -31,12 +31,19 @@
                 />
                 <label for="password">Password</label>
               </div>
+              <div class="input" :class="{ active: isApiKeyFocused || apiKey }">
+                <input
+                  id="api-key"
+                  type="text"
+                  v-model="apiKey"
+                  @focus="focusInput('apiKey')"
+                  @blur="blurInput('apiKey')"
+                />
+                <label for="api-key">TMDB API Key</label>
+              </div>
               <span class="checkbox remember">
                 <input type="checkbox" id="remember" v-model="rememberMe" />
                 <label for="remember" class="read-text">Remember me</label>
-              </span>
-              <span class="checkbox forgot">
-                <a href="#">Forgot Password?</a>
               </span>
               <button :disabled="!isLoginFormValid">Login</button>
             </form>
@@ -49,7 +56,7 @@
             </a>
           </div>
 
-          <!-- Register Card -->
+          <!-- 회원가입 카드 -->
           <div :class="['card', { hidden: isLoginVisible }]" id="register">
             <form @submit.prevent="handleRegister">
               <h1>Sign up</h1>
@@ -81,18 +88,15 @@
                 />
                 <label for="register-password">Password</label>
               </div>
-              <div
-                class="input"
-                :class="{ active: isConfirmPasswordFocused || confirmPassword }"
-              >
+              <div class="input" :class="{ active: isApiKeyFocused || apiKey }">
                 <input
-                  id="confirm-password"
-                  type="password"
-                  v-model="confirmPassword"
-                  @focus="focusInput('confirmPassword')"
-                  @blur="blurInput('confirmPassword')"
+                  id="api-key"
+                  type="text"
+                  v-model="apiKey"
+                  @focus="focusInput('apiKey')"
+                  @blur="blurInput('apiKey')"
                 />
-                <label for="confirm-password">Confirm Password</label>
+                <label for="api-key">TMDB API Key</label>
               </div>
               <span class="checkbox remember">
                 <input type="checkbox" id="terms" v-model="acceptTerms" />
@@ -104,7 +108,6 @@
             </form>
             <a
               href="javascript:void(0)"
-              id="gotologin"
               class="account-check"
               @click="toggleCard"
             >
@@ -118,18 +121,17 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { authService } from "@/utils/AuthService";
 
 const router = useRouter();
-
 const isLoginVisible = ref(true);
 const email = ref("");
 const password = ref("");
+const apiKey = ref("");
 const registerEmail = ref("");
 const registerPassword = ref("");
-const confirmPassword = ref("");
 const rememberMe = ref(false);
 const acceptTerms = ref(false);
 
@@ -137,79 +139,67 @@ const isEmailFocused = ref(false);
 const isPasswordFocused = ref(false);
 const isRegisterEmailFocused = ref(false);
 const isRegisterPasswordFocused = ref(false);
-const isConfirmPasswordFocused = ref(false);
+const isApiKeyFocused = ref(false);
 
 const toggleCard = () => {
   isLoginVisible.value = !isLoginVisible.value;
-  setTimeout(() => {
-    document.getElementById("register")?.classList.toggle("register-swap");
-    document.getElementById("login")?.classList.toggle("login-swap");
-  }, 50);
 };
 
 const focusInput = (inputName) => {
-  switch (inputName) {
-    case "email":
-      isEmailFocused.value = true;
-      break;
-    case "password":
-      isPasswordFocused.value = true;
-      break;
-    case "registerEmail":
-      isRegisterEmailFocused.value = true;
-      break;
-    case "registerPassword":
-      isRegisterPasswordFocused.value = true;
-      break;
-    case "confirmPassword":
-      isConfirmPasswordFocused.value = true;
-      break;
-  }
+  if (inputName === "email") isEmailFocused.value = true;
+  if (inputName === "password") isPasswordFocused.value = true;
+  if (inputName === "registerEmail") isRegisterEmailFocused.value = true;
+  if (inputName === "registerPassword") isRegisterPasswordFocused.value = true;
+  if (inputName === "apiKey") isApiKeyFocused.value = true;
 };
 
 const blurInput = (inputName) => {
-  switch (inputName) {
-    case "email":
-      isEmailFocused.value = false;
-      break;
-    case "password":
-      isPasswordFocused.value = false;
-      break;
-    case "registerEmail":
-      isRegisterEmailFocused.value = false;
-      break;
-    case "registerPassword":
-      isRegisterPasswordFocused.value = false;
-      break;
-    case "confirmPassword":
-      isConfirmPasswordFocused.value = false;
-      break;
-  }
+  if (inputName === "email") isEmailFocused.value = false;
+  if (inputName === "password") isPasswordFocused.value = false;
+  if (inputName === "registerEmail") isRegisterEmailFocused.value = false;
+  if (inputName === "registerPassword") isRegisterPasswordFocused.value = false;
+  if (inputName === "apiKey") isApiKeyFocused.value = false;
 };
 
-const isLoginFormValid = computed(() => email.value && password.value);
-
+const isLoginFormValid = computed(
+  () => email.value && password.value && apiKey.value
+);
 const isRegisterFormValid = computed(
   () =>
     registerEmail.value &&
     registerPassword.value &&
-    confirmPassword.value &&
-    registerPassword.value === confirmPassword.value &&
+    apiKey.value &&
     acceptTerms.value
 );
 
 const handleLogin = async () => {
   try {
+    const isValidApiKey = await authService.validateApiKey(apiKey.value);
+    if (!isValidApiKey) {
+      alert("Invalid TMDB API Key");
+      return;
+    }
     const user = await authService.tryLogin(email.value, password.value);
+    localStorage.setItem("TMDb-Key", apiKey.value);
     router.push("/");
-  } catch (error) {
-    alert("Login failed");
+  } catch (err) {
+    alert(err.message);
   }
 };
 
 const handleRegister = async () => {
   try {
-    await authService.tryRegister(registerEmail.value, registerPassword.value);
+    const isValidApiKey = await authService.validateApiKey(apiKey.value);
+    if (!isValidApiKey) {
+      alert("Invalid TMDB API Key");
+      return;
+    }
+    await authService.tryRegister(
+      registerEmail.value,
+      registerPassword.value,
+      apiKey.value
+    );
+    alert("Registration successful! Please log in.");
     toggleCard();
   } catch (err) {
     alert(err.message);

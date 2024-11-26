@@ -1,27 +1,23 @@
 <template>
   <div class="home">
-    <AppBanner :movie="featuredMovie" />
-
-    <MovieRow title="인기 영화" :fetchUrl="popularMoviesUrl" />
-    <MovieRow title="최신 영화" :fetchUrl="newReleasesUrl" />
-    <MovieRow title="액션 영화" :fetchUrl="actionMoviesUrl" />
+    <Banner :movie="featuredMovie" />
+    <MovieRow title="Popular Movies" :fetchUrl="popularMoviesUrl" />
+    <MovieRow title="New Releases" :fetchUrl="newReleasesUrl" />
+    <MovieRow title="Action Movies" :fetchUrl="actionMoviesUrl" />
   </div>
 </template>
 
 <script>
 import { ref, onMounted, onUnmounted } from "vue";
-import AppBanner from "@/components/home/Banner.vue";
+import Banner from "@/components/home/Banner.vue";
 import MovieRow from "@/components/home/MovieRow.vue";
 import { urlService } from "@/utils/URLService";
 
 export default {
   name: "HomeMain",
-  components: {
-    AppBanner,
-    MovieRow,
-  },
+  components: { Banner, MovieRow },
   setup() {
-    const apiKey = localStorage.getItem("TMDb-Key") || "";
+    const apiKey = localStorage.getItem("TMDb-Key");
     const featuredMovie = ref(null);
     const popularMoviesUrl = ref("");
     const newReleasesUrl = ref("");
@@ -30,10 +26,14 @@ export default {
 
     const loadFeaturedMovie = async () => {
       try {
+        if (!apiKey) {
+          alert("API Key missing. Redirecting to login.");
+          location.href = "/signIn";
+          return;
+        }
         featuredMovie.value = await urlService.fetchFeaturedMovie(apiKey);
-        console.log("Featured movie loaded:", featuredMovie.value);
       } catch (error) {
-        console.error("Error loading featured movie:", error);
+        console.error("Failed to load featured movie:", error);
       }
     };
 
@@ -61,12 +61,7 @@ export default {
       window.removeEventListener("scroll", scrollListener.value);
     });
 
-    return {
-      featuredMovie,
-      popularMoviesUrl,
-      newReleasesUrl,
-      actionMoviesUrl,
-    };
+    return { featuredMovie, popularMoviesUrl, newReleasesUrl, actionMoviesUrl };
   },
 };
 </script>

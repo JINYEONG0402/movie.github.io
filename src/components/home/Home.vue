@@ -15,7 +15,7 @@ import { defineComponent } from "vue";
 import Header from "@/components/home/Header.vue"; // Header 컴포넌트 경로를 확인 후 변경
 
 export default defineComponent({
-  name: "HomePage",
+  name: "Home",
   components: {
     Header, // Header 컴포넌트를 등록
   },

@@ -58,7 +58,7 @@ export default {
       type: String,
       default: "all",
     },
-    voteEverage: {
+    voteEverAge: {
       type: Number,
       default: -1,
     },
@@ -144,7 +144,7 @@ export default {
     };
 
     const scrollToTopAndReset = () => {
-      gridContainer.value.scrollTo({ top: 0, behavior: "smooth" });
+      gridContainer.value.scrollTop({ top: 0, behavior: "smooth" });
       movies.value = [];
       currentPage.value = 1;
       hasMore.value = true;

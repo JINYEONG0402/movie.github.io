@@ -17,7 +17,7 @@
 <script>
 import { defineComponent, ref } from "vue";
 import MovieSearch from "@/components/Search/MovieSearch.vue";
-import MovieInfiniteScroll from "@/components/Scroll.vue";
+import MovieInfiniteScroll from "@/components/MovieInfiniteScroll.vue";
 
 export default defineComponent({
   name: "Search",
@@ -32,7 +32,7 @@ export default defineComponent({
     const sortId = ref("all");
 
     const genreCode = {
-      "장르 (전체)": 0,
+      "장 르": 0,
       Action: 28,
       Adventure: 12,
       Comedy: 35,
@@ -41,13 +41,13 @@ export default defineComponent({
     };
 
     const sortingCode = {
-      "언어 (전체)": "all",
+      "언 어": "all",
       English: "en",
       Korean: "ko",
     };
 
     const ageCode = {
-      "평점 (전체)": -1,
+      "평 점": -1,
       "9~10": 9,
       "8~9": 8,
       "7~8": 7,
