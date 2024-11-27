@@ -30,7 +30,7 @@
               </div>
               <span class="checkbox remember">
                 <input type="checkbox" id="remember" v-model="rememberMe" />
-                <label for="remember" class="read-text">자동저장</label>
+                <label for="remember" class="read-text">자동로그인</label>
               </span>
               <button :disabled="!isLoginFormValid">Login</button>
             </form>
@@ -79,7 +79,7 @@
               <div class="input" :class="{ active: isApiKeyFocused || apiKey }">
                 <input
                   id="api-key"
-                  type="text"
+                  type="password"
                   v-model="apiKey"
                   @focus="focusInput('apiKey')"
                   @blur="blurInput('apiKey')"
@@ -588,12 +588,12 @@ button:hover {
   }
 
   #register.hidden {
-    top: calc(5svh + 90px) !important;
+    top: calc(5svh + 60px) !important;
     z-index: 1;
   }
 
   #login.hidden {
-    top: calc(5svh + 90px) !important;
+    top: calc(5svh + 60px) !important;
     z-index: 1;
   }
 }
