@@ -3,7 +3,7 @@ const { DefinePlugin } = require("webpack");
 
 module.exports = defineConfig({
   transpileDependencies: true,
-  publicPath: process.env.NODE_ENV === "production" ? "/movie.github.io/" : "/",
+  publicPath: "/movie.github.io/",
 
   configureWebpack: {
     plugins: [
