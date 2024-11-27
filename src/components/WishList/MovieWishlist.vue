@@ -18,7 +18,7 @@
             class="wishlist-indicator"
             :class="{ active: isMovieInWishlist(movie.id) }"
           >
-            👍
+            ♥
           </div>
         </div>
       </div>
@@ -169,11 +169,18 @@ export default {
 <style scoped>
 .wishlist-indicator {
   position: absolute;
-  top: 0;
+  top: 10px; /* 하트 위치 조정 */
   right: 10px;
-  font-size: 20px;
-  background-color: rgba(229, 9, 20, 0.5);
-  box-shadow: 0 0 5px rgba(229, 9, 20, 0.7);
+  width: 30px; /* 박스 너비 */
+  height: 30px; /* 박스 높이 */
+  font-size: 30px; /* 하트 크기 */
+  color: #ff35e8;
+  background-color: rgb(0, 0, 0);
+  box-shadow: 0 0 5px rgb(115, 2, 102);
+  display: flex; /* 내용 정렬 */
+  align-items: center; /* 세로 중앙 정렬 */
+  justify-content: center; /* 가로 중앙 정렬 */
+  transition: color 0.3s, background-color 0.3s, transform 0.3s;
 }
 
 .movie-grid {

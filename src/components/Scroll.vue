@@ -1,6 +1,6 @@
 <template>
   <div class="movie-grid" ref="gridContainer">
-    <div :class="['grid-container', currentView]">
+    <div class="grid-container">
       <div
         v-for="(movieGroup, index) in visibleMovieGroups"
         :key="index"
@@ -14,7 +14,7 @@
         >
           <img
             :src="getImageUrl(movie.poster_path)"
-            :alt="movie.title"
+            :alt="movie.title || 'No Title Available'"
             loading="lazy"
           />
           <div class="movie-title">{{ movie.title }}</div>
@@ -35,15 +35,15 @@
   </div>
 </template>
 
-<script>
-import { defineComponent, ref, onMounted, computed } from "vue";
+<script lang="ts">
+import { defineComponent, ref, onMounted, onUnmounted, computed } from "vue";
 
 export default defineComponent({
   name: "MovieScroll",
   props: {
     movies: {
       type: Array,
-      default: () => [], // 기본값으로 빈 배열 설정
+      default: () => [],
     },
     rowSize: {
       type: Number,
@@ -51,19 +51,21 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const gridContainer = ref(null);
-    const currentView = ref("list"); // "list" or "grid"
-    const visibleMovies = ref([]);
+    const gridContainer = ref<HTMLElement | null>(null);
+    const visibleMovies = ref<any[]>([]); // 현재 표시되는 영화
     const isLoading = ref(false);
     const showTopButton = ref(false);
-    const wishlist = ref([]);
+    const wishlist = ref<number[]>([]); // 위시리스트에 있는 영화 ID
 
+    // 영화 그룹을 행 단위로 나누기
     const visibleMovieGroups = computed(() =>
       chunkArray(visibleMovies.value, props.rowSize)
     );
 
+    // 영화 더 가져오기
     const loadMoreMovies = () => {
-      if (isLoading.value || !Array.isArray(props.movies)) return;
+      if (isLoading.value || visibleMovies.value.length >= props.movies.length)
+        return;
 
       isLoading.value = true;
 
@@ -77,10 +79,12 @@ export default defineComponent({
       }, 1000);
     };
 
-    const getImageUrl = (path) =>
+    // 이미지 URL 가져오기
+    const getImageUrl = (path: string | null | undefined): string =>
       path ? `https://image.tmdb.org/t/p/w300${path}` : "/default-image.jpg";
 
-    const toggleWishlist = (movie) => {
+    // 위시리스트 토글
+    const toggleWishlist = (movie: any) => {
       if (wishlist.value.includes(movie.id)) {
         wishlist.value = wishlist.value.filter((id) => id !== movie.id);
       } else {
@@ -88,8 +92,11 @@ export default defineComponent({
       }
     };
 
-    const isInWishlist = (movieId) => wishlist.value.includes(movieId);
+    // 위시리스트에 있는지 확인
+    const isInWishlist = (movieId: number): boolean =>
+      wishlist.value.includes(movieId);
 
+    // 맨 위로 스크롤
     const scrollToTopAndReset = () => {
       if (gridContainer.value) {
         gridContainer.value.scrollTo({ top: 0, behavior: "smooth" });
@@ -97,6 +104,7 @@ export default defineComponent({
       showTopButton.value = false;
     };
 
+    // 스크롤 이벤트 처리
     const handleScroll = () => {
       if (gridContainer.value) {
         const { scrollTop, scrollHeight, clientHeight } = gridContainer.value;
@@ -108,8 +116,9 @@ export default defineComponent({
       }
     };
 
-    const chunkArray = (array, size) => {
-      if (!Array.isArray(array)) return []; // 배열인지 확인
+    // 배열을 행 단위로 나누기
+    const chunkArray = (array: any[], size: number) => {
+      if (!Array.isArray(array) || size <= 0) return [];
       const chunks = [];
       for (let i = 0; i < array.length; i += size) {
         chunks.push(array.slice(i, i + size));
@@ -125,9 +134,14 @@ export default defineComponent({
       }
     });
 
+    onUnmounted(() => {
+      if (gridContainer.value) {
+        gridContainer.value.removeEventListener("scroll", handleScroll);
+      }
+    });
+
     return {
       gridContainer,
-      currentView,
       visibleMovieGroups,
       isLoading,
       showTopButton,
@@ -139,6 +153,7 @@ export default defineComponent({
   },
 });
 </script>
+
 <style scoped>
 .movie-grid {
   display: flex;

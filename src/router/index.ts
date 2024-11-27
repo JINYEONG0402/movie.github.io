@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import SignIn from "@/components/SignIn.vue";
 import Home from "@/components/home/Home.vue";
 import HomeMain from "@/components/home/HomeMain.vue";
+import HomePopular from "@/components/home/HomePopular.vue";
 import Search from "@/components/Search/Search.vue";
 import HomeWish from "@/components/WishList/HomeWishList.vue";
 import { authGuard } from "@/router/guard"; // 인증 가드
@@ -21,6 +22,11 @@ const routes = [
         path: "wishlist",
         name: "HomeWish",
         component: HomeWish,
+      },
+      {
+        path: "popular",
+        name: "HomePopular",
+        component: HomePopular,
       },
       {
         path: "/Search",

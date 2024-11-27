@@ -3,8 +3,11 @@
     <!-- 제목 -->
     <h2 v-if="!loading">{{ title }}</h2>
 
+    <!-- Skeleton UI 로딩 인디케이터 -->
     <div v-if="loading" class="loading-indicator">
-      <p>Loading movies...</p>
+      <div v-for="n in 5" :key="n" class="movie-card skeleton">
+        <div class="skeleton-image"></div>
+      </div>
     </div>
 
     <!-- 슬라이더 -->
@@ -34,9 +37,11 @@
           >
             <img
               :src="getImageUrl(movie.poster_path)"
-              :alt="movie.title || 'No title available'"
+              :alt="movie.title || 'No Title Available'"
+              loading="lazy"
               @error="handleImageError"
             />
+
             <!-- 위시리스트 표시 -->
             <div v-if="isInWishlist(movie.id)" class="wishlist-indicator">
               👍
@@ -103,7 +108,7 @@ export default defineComponent({
     const fetchMovies = async () => {
       try {
         const response = await axios.get(props.fetchUrl);
-        movies.value = response.data.results || []; // 데이터 배열 초기화
+        movies.value = response.data.results || [];
       } catch (error) {
         console.error("Error fetching movies:", error);
         movies.value = []; // 실패 시 빈 배열로 초기화
@@ -180,62 +185,29 @@ export default defineComponent({
 
 <style scoped>
 .loading-indicator {
-  text-align: center;
+  display: flex;
+  gap: 10px;
   padding: 20px;
-  color: white;
-}
-
-.wishlist-indicator {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 5px;
-  border-radius: 50%;
-  font-size: 12px;
-}
-
-.movie-row {
-  margin-bottom: 40px;
-  position: relative;
-  width: 100%;
-  overflow: hidden;
 }
 
 .movie-row h2 {
-  text-align: left;
-  margin-left: 30px;
+  margin-left: 20px;
   color: white;
 }
 
 .slider-container {
   position: relative;
-  touch-action: pan-y;
+  margin: 20px 0;
 }
 
 .slider-window {
   overflow: hidden;
-  margin: 0 40px;
+  margin: 0 20px;
 }
 
 .movie-slider {
   display: flex;
-  transition: transform 0.3s ease;
-  padding: 20px 0;
-}
-
-.movie-card {
-  flex: 0 0 auto;
-  width: 200px;
-  margin-right: 10px;
-  transition: transform 0.3s;
-  position: relative;
-  cursor: pointer;
-}
-
-.movie-card:hover {
-  transform: scale(1.05);
+  transition: transform 0.01s ease;
 }
 
 .movie-card img {
@@ -244,6 +216,7 @@ export default defineComponent({
   border-radius: 4px;
 }
 
+/* 버튼 스타일 */
 .slider-button {
   position: absolute;
   top: 50%;
@@ -251,45 +224,6 @@ export default defineComponent({
   background-color: rgba(0, 0, 0, 0.5);
   color: white;
   border: none;
-  padding: 20px 10px;
   cursor: pointer;
-  z-index: 10;
-  transition: opacity 0.3s, background-color 0.3s;
-}
-
-.slider-button:hover {
-  background-color: rgba(242, 0, 255, 0.8);
-}
-
-.slider-button.left {
-  left: 0;
-}
-
-.slider-button.right {
-  right: 0;
-}
-
-.slider-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-@media (max-width: 768px) {
-  .movie-row {
-    margin-bottom: 20px;
-  }
-
-  .movie-card {
-    width: 120px;
-    margin-right: 5px;
-  }
-
-  .movie-slider {
-    padding: 0;
-  }
-
-  .slider-window {
-    margin: 0 10px;
-  }
 }
 </style>

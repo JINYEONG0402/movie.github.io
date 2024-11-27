@@ -1,6 +1,6 @@
 <template>
   <div class="movie-grid" ref="gridContainer">
-    <div :class="['grid-container', currentView]">
+    <div :class="['grid-container', { list: currentView === 'list' }]">
       <div
         v-for="(movieGroup, index) in visibleMovieGroups"
         :key="index"
@@ -14,11 +14,10 @@
         >
           <img
             :src="getImageUrl(movie.poster_path)"
-            :alt="movie.title"
+            :alt="movie.title || 'No Title Available'"
             loading="lazy"
           />
           <div class="movie-title">{{ movie.title }}</div>
-          <div v-if="isInWishlist(movie.id)" class="wishlist-indicator">👍</div>
         </div>
       </div>
     </div>
@@ -58,7 +57,7 @@ export default {
       type: String,
       default: "all",
     },
-    voteEverAge: {
+    voteAverage: {
       type: Number,
       default: -1,
     },
@@ -70,7 +69,7 @@ export default {
     const isLoading = ref(false);
     const hasMore = ref(true);
     const currentView = ref("grid");
-    const showTopButton = ref(false); // 초기값 false
+    const showTopButton = ref(false);
     const gridContainer = ref(null);
     const wishlist = ref([]);
     let observer;
@@ -92,16 +91,16 @@ export default {
         };
 
         if (props.genreCode !== "0") {
-          params.with_genres = props.genreCode; // 장르 필터 추가
+          params.with_genres = props.genreCode;
         }
 
-        if (props.voteEverAge > 0) {
-          params["vote_average.gte"] = props.voteEverAge; // 평점 필터 추가
-          params["vote_average.lte"] = props.voteEverAge + 1; // 최대값 설정
+        if (props.voteAverage > 0) {
+          params["vote_average.gte"] = props.voteAverage;
+          params["vote_average.lte"] = props.voteAverage + 1;
         }
 
         if (props.sortingOrder !== "all") {
-          params.with_original_language = props.sortingOrder; // 언어 필터 추가
+          params.with_original_language = props.sortingOrder;
         }
 
         const response = await axios.get(url, { params });
@@ -143,7 +142,7 @@ export default {
       } else {
         wishlist.value.push(movie.id);
       }
-      console.log("Current Wishlist:", wishlist.value); // 찜 상태 확인
+      console.log("Current Wishlist:", wishlist.value);
     };
 
     const isInWishlist = (movieId) => wishlist.value.includes(movieId);
@@ -152,7 +151,7 @@ export default {
       const container = gridContainer.value;
       if (container) {
         const scrollTop = container.scrollTop;
-        showTopButton.value = scrollTop > 300; // 300px 이상 스크롤 시 버튼 표시
+        showTopButton.value = scrollTop > 300;
       }
     };
 
@@ -161,11 +160,9 @@ export default {
       if (container) {
         container.scrollTo({
           top: 0,
-          behavior: "smooth", // 부드러운 스크롤
+          behavior: "smooth",
         });
       }
-
-      // 데이터 초기화 및 재로드
       movies.value = [];
       currentPage.value = 1;
       hasMore.value = true;
@@ -224,7 +221,7 @@ export default {
 .movie-grid {
   width: 100%;
   margin-bottom: 40px;
-  margin-top: 30px;
+  margin-top: 50px;
   overflow-y: auto;
   height: 80vh;
   display: flex;
@@ -235,6 +232,10 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.grid-container.list {
+  align-items: flex-start;
 }
 
 .movie-row {
@@ -259,9 +260,9 @@ export default {
   overflow: hidden;
 }
 
-.movie-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+.grid-container.list .movie-card {
+  width: 100%;
+  margin: 10px 0;
 }
 
 .movie-card img {
@@ -272,32 +273,9 @@ export default {
   display: block;
 }
 
-.movie-title {
-  margin-top: 8px;
-  padding: 0 5px;
-  text-align: center;
-  font-size: 14px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: #fff;
-}
-
-.wishlist-indicator {
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  font-size: 30px;
-  background-color: rgba(242, 0, 255, 0.8);
-  padding: 5px;
-  border-radius: 50%;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  animation: popIn 0.3s ease-out;
-}
-
 .loading-trigger {
   height: 20px;
-  margin-top: 20px;
+  margin-top: 40px;
   text-align: center;
   display: block;
 }
@@ -349,43 +327,6 @@ export default {
 @keyframes spin {
   to {
     transform: rotate(360deg);
-  }
-}
-
-@keyframes popIn {
-  0% {
-    transform: scale(0);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@media (max-width: 768px) {
-  .movie-card {
-    width: 120px;
-    margin: 0 5px;
-  }
-
-  .movie-title {
-    font-size: 12px;
-  }
-
-  .wishlist-indicator {
-    font-size: 20px;
-    top: -5px;
-    right: -5px;
-  }
-  .top-button {
-    width: 40px;
-    height: 40px;
-    font-size: 14px;
-  }
-
-  .loading-indicator {
-    font-size: 14px;
   }
 }
 </style>

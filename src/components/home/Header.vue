@@ -13,14 +13,14 @@
         <nav class="nav-links desktop-nav">
           <ul>
             <li><router-link to="/">홈</router-link></li>
-            <li><router-link to="/popular">카테고리</router-link></li>
+            <li><router-link to="/popular">요즘 핫한</router-link></li>
             <li><router-link to="/wishlist">위시 리스트</router-link></li>
-            <li><router-link to="/search">검 색</router-link></li>
+            <li><router-link to="/search">카테고리</router-link></li>
           </ul>
         </nav>
       </div>
       <div class="header-right">
-        <button class="icon-button" @click="removeKey">
+        <button class="icon-button" @click="toggleUserMenu">
           <font-awesome-icon icon="user" />
         </button>
         <button
@@ -29,6 +29,11 @@
         >
           <font-awesome-icon icon="bars" />
         </button>
+
+        <!-- 로그아웃 버튼 -->
+        <div v-if="showUserMenu" class="user-menu">
+          <button class="logout-button" @click="removeKey">Logout</button>
+        </div>
       </div>
     </header>
 
@@ -44,7 +49,7 @@
           </li>
           <li>
             <router-link to="/popular" @click="toggleMobileMenu"
-              >카테고리</router-link
+              >요즘 핫한</router-link
             >
           </li>
           <li>
@@ -54,7 +59,7 @@
           </li>
           <li>
             <router-link to="/search" @click="toggleMobileMenu"
-              >검 색</router-link
+              >카테고리</router-link
             >
           </li>
         </ul>
@@ -88,6 +93,7 @@ export default {
   setup() {
     const isScrolled = ref(false);
     const isMobileMenuOpen = ref(false);
+    const showUserMenu = ref(false);
     const router = useRouter();
 
     const handleScroll = () => {
@@ -96,6 +102,10 @@ export default {
 
     const toggleMobileMenu = () => {
       isMobileMenuOpen.value = !isMobileMenuOpen.value;
+    };
+
+    const toggleUserMenu = () => {
+      showUserMenu.value = !showUserMenu.value;
     };
 
     const removeKey = () => {
@@ -114,7 +124,9 @@ export default {
     return {
       isScrolled,
       isMobileMenuOpen,
+      showUserMenu,
       toggleMobileMenu,
+      toggleUserMenu,
       removeKey,
     };
   },
@@ -122,13 +134,14 @@ export default {
 </script>
 
 <style scoped>
+/* Header Styling */
 .app-header {
   height: 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 20px 4%;
-  background-color: black;
+  background-color: #000000;
   position: fixed;
   top: 0;
   left: 0;
@@ -146,11 +159,10 @@ export default {
 .logo {
   height: 30px;
   margin-right: 30px;
-  justify-items: center;
-  align-items: center;
-  font-size: 1.5rem; /* 크기 조정 */
+  font-size: 1.5rem;
 }
 
+/* Desktop Navigation Styling */
 .nav-links ul {
   display: flex;
   list-style-type: none;
@@ -163,29 +175,18 @@ export default {
 }
 
 .nav-links a {
-  color: #e5e5e5;
+  color: #ffffff;
   text-decoration: none;
   font-size: 0.85rem;
   transition: color 0.3s ease;
+  text-shadow: 3px 3px 6px rgb(255, 53, 232);
 }
 
 .nav-links a:hover {
   color: #b3b3b3;
 }
 
-.icon-button {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.2rem;
-  margin-left: 20px;
-  cursor: pointer;
-}
-
-.icon-button:hover {
-  opacity: 0.5;
-}
-
+/* Mobile Navigation Styling */
 .mobile-menu-button {
   display: none;
 }
@@ -194,8 +195,8 @@ export default {
   display: none;
   position: fixed;
   top: 0;
-  right: -100%;
-  width: 50%;
+  right: -100%; /* 숨겨진 상태 */
+  width: 100%; /* 모바일 전체 너비 */
   height: 100%;
   background-color: #141414;
   z-index: 1001;
@@ -203,13 +204,14 @@ export default {
 }
 
 .mobile-nav.open {
-  right: 0;
+  right: 0; /* 활성 상태 */
 }
 
 .mobile-nav ul {
   list-style-type: none;
-  padding: 0;
-  margin-top: 60px;
+  padding: 20px 0;
+  margin: 0;
+  text-align: center; /* 가운데 정렬 */
 }
 
 .mobile-nav li {
@@ -221,7 +223,7 @@ export default {
   text-decoration: none;
   font-size: 1.2rem;
   display: block;
-  padding: 10px 20px;
+  padding: 10px;
 }
 
 .close-button {
@@ -235,6 +237,32 @@ export default {
   cursor: pointer;
 }
 
+/* User Menu Styling */
+.user-menu {
+  position: absolute;
+  top: 50px;
+  right: 20px;
+  background-color: #141414;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.logout-button {
+  background: none;
+  border: none;
+  color: #e5e5e5;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.logout-button:hover {
+  color: #b3b3b3;
+}
+
+/* Responsive Styling */
 @media (max-width: 768px) {
   .desktop-nav {
     display: none;
