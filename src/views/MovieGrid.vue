@@ -134,28 +134,31 @@ export default defineComponent({
 </script>
 
 <style scoped>
+/* 공통 스타일 */
 .movie-grid {
   display: flex;
   flex-direction: column;
-  margin: 0 0;
+  margin: 0 auto; /* 중앙 정렬 */
+  padding: 0 10px; /* 양쪽 여백 추가 */
 }
 
 .grid-container {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 10px; /* 카드 간격 조정 */
 }
 
 .movie-row {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
+  gap: 10px; /* 카드 간 간격 추가 */
 }
 
 .movie-card {
-  flex: 1;
-  width: 150px;
-  margin: 100px;
+  flex: 1 0 45%; /* 카드 크기를 화면에 맞게 조정 (45%) */
+  max-width: 150px; /* 최대 너비 제한 */
+  margin: 10px; /* 카드 여백 조정 */
   cursor: pointer;
 }
 
@@ -168,15 +171,35 @@ export default defineComponent({
 }
 
 .pagination button {
-  padding: 5px 10px;
+  padding: 10px 15px;
   border: none;
+  border-radius: 5px; /* 버튼에 라운드 처리 */
   background-color: #333;
   color: white;
+  font-size: 14px;
   cursor: pointer;
 }
 
 .pagination button[disabled] {
   background-color: #777;
   cursor: not-allowed;
+}
+
+/* 아이폰 13 및 유사한 화면 크기를 위한 미디어 쿼리 */
+@media (max-width: 390px) {
+  .movie-card {
+    flex: 1 0 100%; /* 카드가 한 줄에 하나씩 나타나도록 조정 */
+    max-width: 100%; /* 최대 너비를 부모 요소로 제한 */
+    margin: 10px 0; /* 상하 간격 추가 */
+  }
+
+  .grid-container {
+    gap: 5px; /* 간격 축소 */
+  }
+
+  .pagination button {
+    padding: 8px 12px; /* 버튼 크기 줄임 */
+    font-size: 12px; /* 버튼 폰트 크기 줄임 */
+  }
 }
 </style>
