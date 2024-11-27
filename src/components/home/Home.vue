@@ -28,6 +28,12 @@ export default defineComponent({
   height: 95svh;
   overflow-x: hidden;
   margin: 5px;
+
+  @media (max-width: 390px) and (max-height: 844px) {
+    width: 100vw; /* 뷰포트 전체 너비 사용 */
+    height: 100vh; /* 뷰포트 전체 높이 사용 */
+    margin: 0; /* 마진 제거 */
+  }
 }
 #container {
   padding: 20px;

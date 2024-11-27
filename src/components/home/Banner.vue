@@ -95,14 +95,14 @@ export default {
   width: 150px;
 }
 
-@media screen and (max-height: 768px) {
+@media screen and (max-width: 390px) and (max-height: 844px) {
   .banner h1 {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
+    font-size: 2rem; /* 헤딩 폰트 크기를 아이폰 13 화면에 맞게 조정 */
+    margin-bottom: 0.4rem; /* 여백 줄이기 */
   }
 
   .banner-content {
-    padding: 15px;
+    padding: 10px; /* 패딩 축소 */
     background: linear-gradient(
       to top,
       rgba(0, 0, 0, 0.8) 0%,
@@ -116,16 +116,16 @@ export default {
   }
 
   .banner p {
-    font-size: 0.9rem;
-    max-width: 500px;
-    margin-bottom: 1rem;
+    font-size: 0.85rem; /* 더 작은 폰트 크기 */
+    max-width: 350px; /* 아이폰 13 화면 너비에 맞게 제한 */
+    margin-bottom: 0.8rem; /* 여백 줄이기 */
     text-align: left;
   }
 
   .title-btn {
-    margin-top: 5px;
-    width: 100px;
-    font-size: 0.75rem;
+    margin-top: 4px;
+    width: 90px; /* 버튼 너비 줄이기 */
+    font-size: 0.7rem; /* 작은 버튼 폰트 크기 */
   }
 }
 </style>

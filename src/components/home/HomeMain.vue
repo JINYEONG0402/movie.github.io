@@ -216,4 +216,28 @@ export default {
   box-shadow: 0 0 5px rgb(255, 53, 232);
   transform: scale(1.1);
 }
+@media screen and (max-width: 390px) and (max-height: 844px) {
+  .movie-row {
+    gap: 8px; /* 카드 간격 더 줄이기 */
+    padding: 5px; /* 패딩 최소화 */
+  }
+
+  .movie-card {
+    width: 100px; /* 더 작은 카드 크기 */
+  }
+
+  .movie-card img {
+    border-radius: 6px; /* 이미지 모서리 둥글게 */
+  }
+
+  .movie-card p {
+    font-size: 0.7rem; /* 텍스트 크기 줄이기 */
+  }
+
+  .wishlist-indicator {
+    width: 20px; /* 아이콘 크기 더 줄이기 */
+    height: 20px;
+    font-size: 20px;
+  }
+}
 </style>
