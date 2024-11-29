@@ -1,31 +1,38 @@
 name: Deploy to GitHub Pages
 
+# main 브랜치에 푸시되면 실행되도록 설정
 on:
   push:
     branches:
       - main
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
+    # 1. 저장소를 체크아웃합니다.
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    # 2. Node.js 환경을 설정합니다.
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '20'
 
+    # 3. 의존성을 설치합니다.
     - name: Install dependencies
       run: npm install
 
+    # 4. 프로젝트를 빌드합니다.
     - name: Build project
       run: npm run build
 
+    # 5. 이전 배포 파일 삭제 후 새 파일 업로드
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./dist
+        github_token: ${{ secrets.GITHUB_TOKEN }} # GitHub Pages 배포 권한
+        publish_dir: ./dist                      # 빌드된 결과물 디렉토리
+        destination_branch: gh-pages             # 배포 브랜치
