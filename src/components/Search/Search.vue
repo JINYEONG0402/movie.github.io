@@ -58,7 +58,10 @@ import { wishListService } from "@/utils/WishList";
 export default {
   name: "Search",
   setup() {
-    const apiKey = ref("fb2191b2c2e7923b7b79f8e3fa925043");
+    // 환경 변수에서 API 키와 BASE URL 가져오기
+    const apiKey = process.env.VUE_APP_TMDB_API_KEY;
+    const baseURL = process.env.VUE_APP_TMDB_BASE_URL;
+
     const selectedGenre = ref(0); // 기본 장르
     const selectedSort = ref("all"); // 기본 정렬
     const selectedAge = ref(-1); // 기본 평점
@@ -113,7 +116,7 @@ export default {
       const ageQuery =
         selectedAge.value >= 0 ? `&vote_average.gte=${selectedAge.value}` : "";
 
-      const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey.value}&language=ko-KR&page=${page}${genreQuery}${sortQuery}${ageQuery}`;
+      const url = `${baseURL}/discover/movie?api_key=${apiKey}&language=ko-KR&page=${page}${genreQuery}${sortQuery}${ageQuery}`;
 
       try {
         const response = await fetch(url);

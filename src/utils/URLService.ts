@@ -2,12 +2,13 @@ import axios from "axios";
 import { Movie } from "@/type/type";
 
 export class URLService {
-  private readonly API_KEY = "fb2191b2c2e7923b7b79f8e3fa925043";
+  private readonly API_KEY = process.env.VUE_APP_TMDB_API_KEY;
+  private readonly BASE_URL = process.env.VUE_APP_TMDB_BASE_URL;
 
   async fetchFeaturedMovie(): Promise<Movie> {
     try {
       const response = await axios.get(
-        `https://api.themoviedb.org/3/movie/popular?api_key=${this.API_KEY}&language=ko-KR`
+        `${this.BASE_URL}/movie/popular?api_key=${this.API_KEY}&language=ko-KR`
       );
       return response.data.results[0] as Movie;
     } catch (error) {
@@ -17,15 +18,15 @@ export class URLService {
   }
 
   getURL4PopularMovies(page = 1): string {
-    return `https://api.themoviedb.org/3/movie/popular?api_key=${this.API_KEY}&language=ko-KR&page=${page}`;
+    return `${this.BASE_URL}/movie/popular?api_key=${this.API_KEY}&language=ko-KR&page=${page}`;
   }
 
   getURL4ReleaseMovies(page = 2): string {
-    return `https://api.themoviedb.org/3/movie/now_playing?api_key=${this.API_KEY}&language=ko-KR&page=${page}`;
+    return `${this.BASE_URL}/movie/now_playing?api_key=${this.API_KEY}&language=ko-KR&page=${page}`;
   }
 
   getURL4GenreMovies(genre: string, page = 1): string {
-    return `https://api.themoviedb.org/3/discover/movie?api_key=${this.API_KEY}&with_genres=${genre}&language=ko-KR&page=${page}`;
+    return `${this.BASE_URL}/discover/movie?api_key=${this.API_KEY}&with_genres=${genre}&language=ko-KR&page=${page}`;
   }
 }
 

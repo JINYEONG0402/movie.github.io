@@ -40,7 +40,6 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faTh, faBars } from "@fortawesome/free-solid-svg-icons";
 import MovieGrid from "@/views/MovieGrid.vue";
 import MovieInfiniteScroll from "@/views/MovieInfiniteScroll.vue";
-import { urlService } from "@/utils/URLService";
 
 export default defineComponent({
   name: "Popular",
@@ -50,7 +49,10 @@ export default defineComponent({
     MovieInfiniteScroll,
   },
   setup() {
-    const apiKey = "fb2191b2c2e7923b7b79f8e3fa925043"; // TMDB API 키 설정
+    // 환경 변수에서 API 키와 BASE URL 가져오기
+    const apiKey = process.env.VUE_APP_TMDB_API_KEY;
+    const baseURL = process.env.VUE_APP_TMDB_BASE_URL;
+
     const currentView = ref<"grid" | "list">("grid"); // 현재 뷰 상태
     const genreCode = ref("28"); // 기본 장르 코드 (액션)
     const sortingOrder = ref("all"); // 기본 정렬 순서
@@ -58,7 +60,7 @@ export default defineComponent({
 
     const fetchURL = computed(() => {
       // TMDB 인기 영화 API URL 생성
-      return `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=ko-KR&page=1`;
+      return `${baseURL}/movie/popular?api_key=${apiKey}&language=ko-KR&page=1`;
     });
 
     const setView = (view: "grid" | "list") => {
