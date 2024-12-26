@@ -1,11 +1,9 @@
 <template>
   <div class="movie-grid" ref="gridContainer">
-    <!-- 로그인 상태 확인 -->
     <div v-if="!isLoggedIn" class="empty-wishlist">
       로그인이 필요한 서비스입니다.
     </div>
     <div v-else>
-      <!-- 영화 리스트 렌더링 -->
       <div :class="['grid-container', currentView]">
         <div
           v-for="(movieGroup, i) in visibleWishlistMovies"
@@ -22,7 +20,7 @@
             <div class="movie-title">{{ movie.title }}</div>
             <div
               class="wishlist-indicator"
-              :class="{ active: isInWishlist(movie.id) }"
+              :class="{ active: isMovieInWishlist(movie.id) }"
             >
               ♥
             </div>
@@ -46,44 +44,44 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { wishListService } from "@/utils/WishList";
 
 export default {
   name: "MovieWishlist",
   setup() {
     const gridContainer = ref(null);
+    const wishlistMovies = ref([]);
+    const visibleWishlistMovies = ref([]);
     const currentView = ref("grid");
     const currentPage = ref(1);
     const rowSize = ref(4);
     const moviesPerPage = ref(20);
     const isMobile = ref(window.innerWidth <= 768);
 
-    // WishListService에서 데이터 가져오기
-    const wishlistMovies = wishListService.wishlist$;
+    const isLoggedIn = computed(() => {
+      return !!localStorage.getItem("kakao_token");
+    });
 
-    // 로그인 여부 확인
-    const isLoggedIn = computed(() => !!localStorage.getItem("kakao_token"));
+    const getUserId = () => {
+      const userInfo = localStorage.getItem("userInfo");
+      return userInfo ? JSON.parse(userInfo).id : null;
+    };
 
-    // 영화 포스터 URL 가져오기
+    const loadWishlist = () => {
+      if (isLoggedIn.value) {
+        wishlistMovies.value = wishListService.getCurrentWishlist();
+        updateVisibleMovies();
+      } else {
+        wishlistMovies.value = [];
+      }
+    };
+
     const getImageUrl = (path) =>
       path
         ? `https://image.tmdb.org/t/p/w300${path}`
         : "/placeholder-image.jpg";
 
-    // 위시리스트 추가/제거
-    const toggleWishlist = (movie) => {
-      if (!isLoggedIn.value) {
-        alert("위시리스트를 사용하려면 로그인이 필요합니다.");
-        return;
-      }
-      wishListService.toggleWishlist(movie);
-    };
-
-    // 특정 영화가 위시리스트에 있는지 확인
-    const isInWishlist = (movieId) => wishListService.isInWishlist(movieId);
-
-    // 화면 크기에 따라 레이아웃 계산
     const calculateLayout = () => {
       if (!gridContainer.value) return;
 
@@ -106,51 +104,69 @@ export default {
       updateVisibleMovies();
     };
 
-    // 현재 페이지에 보일 영화 계산
     const updateVisibleMovies = () => {
       const startIndex = (currentPage.value - 1) * moviesPerPage.value;
       const endIndex = startIndex + moviesPerPage.value;
       const paginatedMovies = wishlistMovies.value.slice(startIndex, endIndex);
 
-      return paginatedMovies.reduce((resultArray, item, index) => {
-        const groupIndex = Math.floor(index / rowSize.value);
-        if (!resultArray[groupIndex]) {
-          resultArray[groupIndex] = [];
-        }
-        resultArray[groupIndex].push(item);
-        return resultArray;
-      }, []);
+      visibleWishlistMovies.value = paginatedMovies.reduce(
+        (resultArray, item, index) => {
+          const groupIndex = Math.floor(index / rowSize.value);
+          if (!resultArray[groupIndex]) {
+            resultArray[groupIndex] = [];
+          }
+          resultArray[groupIndex].push(item);
+          return resultArray;
+        },
+        []
+      );
     };
 
-    // 계산 속성: 현재 보이는 영화 그룹
-    const visibleWishlistMovies = computed(() => updateVisibleMovies());
-
-    // 계산 속성: 전체 페이지 수
     const totalPages = computed(() =>
       Math.ceil(wishlistMovies.value.length / moviesPerPage.value)
     );
 
-    // 다음 페이지로 이동
     const nextPage = () => {
       if (currentPage.value < totalPages.value) {
         currentPage.value++;
+        updateVisibleMovies();
       }
     };
 
-    // 이전 페이지로 이동
     const prevPage = () => {
       if (currentPage.value > 1) {
         currentPage.value--;
+        updateVisibleMovies();
       }
     };
 
-    // 화면 크기 변경 시 레이아웃 재계산
+    const toggleWishlist = (movie) => {
+      if (isLoggedIn.value) {
+        wishListService.toggleWishlist(movie);
+        loadWishlist();
+      } else {
+        alert("위시리스트를 사용하려면 로그인이 필요합니다.");
+      }
+    };
+
+    const isMovieInWishlist = (movieId) => {
+      return wishListService.isInWishlist(movieId);
+    };
+
     const handleResize = () => {
       isMobile.value = window.innerWidth <= 768;
       calculateLayout();
     };
 
+    watch(
+      () => wishListService.wishlist$.value,
+      () => {
+        loadWishlist();
+      }
+    );
+
     onMounted(() => {
+      loadWishlist();
       calculateLayout();
       window.addEventListener("resize", handleResize);
     });
@@ -174,7 +190,7 @@ export default {
       nextPage,
       prevPage,
       toggleWishlist,
-      isInWishlist,
+      isMovieInWishlist,
     };
   },
 };

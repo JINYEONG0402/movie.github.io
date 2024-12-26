@@ -27,7 +27,7 @@
           v-for="movie in movies"
           :key="movie.id"
           class="movie-card"
-          @click="toggleWishlist(movie)"
+          @click="isLoggedIn ? handleWishlistClick(movie) : null"
         >
           <img
             v-if="movie.poster_path"
@@ -37,6 +37,7 @@
           <p>{{ movie.title }}</p>
           <!-- Wishlist 상태 표시 -->
           <span
+            v-if="isLoggedIn"
             class="wishlist-indicator"
             :class="{ active: isInWishlist(movie.id) }"
           >
@@ -57,7 +58,7 @@ import { wishListService } from "@/utils/WishList";
 export default {
   name: "Search",
   setup() {
-    const apiKey = ref(localStorage.getItem("TMDb-Key") || "");
+    const apiKey = ref("fb2191b2c2e7923b7b79f8e3fa925043");
     const selectedGenre = ref(0); // 기본 장르
     const selectedSort = ref("all"); // 기본 정렬
     const selectedAge = ref(-1); // 기본 평점
@@ -65,6 +66,7 @@ export default {
     const currentPage = ref(1); // 현재 페이지
     const totalPages = ref(1); // 총 페이지 수
     const isLoading = ref(false); // 로딩 상태
+    const isLoggedIn = ref(!!localStorage.getItem("kakao_token"));
     const genreCode = {
       "장르 (전체)": 0,
       "액 션": 28,
@@ -155,12 +157,17 @@ export default {
       fetchMovies(1);
     };
 
-    const toggleWishlist = (movie) => {
+    const handleWishlistClick = (movie) => {
+      const kakaoToken = localStorage.getItem("kakao_token");
+      if (!kakaoToken) {
+        alert("위시리스트를 사용하려면 로그인이 필요합니다.");
+        return;
+      }
       wishListService.toggleWishlist(movie);
     };
 
     const isInWishlist = (movieId) => {
-      return wishListService.isInWishlist(movieId);
+      return isLoggedIn.value && wishListService.isInWishlist(movieId);
     };
 
     onMounted(() => {
@@ -183,9 +190,10 @@ export default {
       ageCode,
       resetFilters,
       updateMovies,
-      toggleWishlist,
+      handleWishlistClick,
       isInWishlist,
       isLoading,
+      isLoggedIn,
     };
   },
 };

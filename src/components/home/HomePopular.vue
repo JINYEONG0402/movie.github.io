@@ -50,14 +50,15 @@ export default defineComponent({
     MovieInfiniteScroll,
   },
   setup() {
-    const apiKey = localStorage.getItem("TMDb-Key") || ""; // API 키 가져오기
+    const apiKey = "fb2191b2c2e7923b7b79f8e3fa925043"; // TMDB API 키 설정
     const currentView = ref<"grid" | "list">("grid"); // 현재 뷰 상태
-    const genreCode = ref("28"); // 기본 장르 코드
+    const genreCode = ref("28"); // 기본 장르 코드 (액션)
     const sortingOrder = ref("all"); // 기본 정렬 순서
     const voteAverage = ref(-1); // 기본 평점
 
     const fetchURL = computed(() => {
-      return urlService.getURL4PopularMovies(1); // apiKey 대신 page number 전달
+      // TMDB 인기 영화 API URL 생성
+      return `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=ko-KR&page=1`;
     });
 
     const setView = (view: "grid" | "list") => {
