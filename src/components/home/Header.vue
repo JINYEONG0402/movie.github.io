@@ -266,4 +266,37 @@ export default {
 .nav-links a:hover {
   color: #f203ff; /* 마우스 호버 시 색상 변경 */
 }
+/* 모바일 반응형 스타일 */
+@media screen and (max-width: 768px) {
+  .hamburger-menu {
+    display: block;
+  }
+
+  .nav-links {
+    display: none; /* 기본 상태에서 숨김 */
+    flex-direction: column;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    background-color: #000;
+    padding: 10px;
+    border-top: 1px solid #333;
+  }
+
+  .nav-links.open {
+    display: flex; /* 햄버거 메뉴 클릭 시 보이도록 설정 */
+  }
+
+  .nav-links ul {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .nav-links a {
+    font-size: 1.2rem;
+    text-align: center;
+    padding: 10px 0;
+  }
+}
 </style>
