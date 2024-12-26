@@ -119,7 +119,7 @@ export default {
     const router = useRouter();
 
     const KAKAO_CLIENT_ID = "27d7fae4bb996ac3f5874f779a8f0df8";
-    const KAKAO_REDIRECT_URI = "https://jinyeong0402.github.io/";
+    const KAKAO_REDIRECT_URI = "https://jymovie.netlify.app/";
 
     const handleScroll = () => {
       isScrolled.value = window.scrollY > 50;
