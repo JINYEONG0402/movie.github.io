@@ -68,7 +68,7 @@ export default {
     // 환경 변수 검증
     if (!KAKAO_CLIENT_ID || !KAKAO_REDIRECT_URI) {
       console.error(
-        "카카오 클라이언트 ID 또는 리다이렉트 URI가 설정되지 않았습니다."
+        "카카오 클라이언트 ID 또는 리다이렉트 URI 설정되지 않았습니다."
       );
     }
 
