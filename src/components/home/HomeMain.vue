@@ -17,7 +17,6 @@
           />
           <p>{{ movie.title }}</p>
           <span
-            v-if="isLoggedIn"
             class="wishlist-indicator"
             :class="{ active: isInWishlist(movie.id) }"
           >
@@ -42,7 +41,6 @@
           />
           <p>{{ movie.title }}</p>
           <span
-            v-if="isLoggedIn"
             class="wishlist-indicator"
             :class="{ active: isInWishlist(movie.id) }"
           >
@@ -67,7 +65,6 @@
           />
           <p>{{ movie.title }}</p>
           <span
-            v-if="isLoggedIn"
             class="wishlist-indicator"
             :class="{ active: isInWishlist(movie.id) }"
           >
@@ -97,7 +94,6 @@ export default {
     const popularMovies = ref([]);
     const newReleases = ref([]);
     const actionMovies = ref([]);
-    const isLoggedIn = ref(false);
 
     const loadMovies = async () => {
       try {
@@ -138,14 +134,8 @@ export default {
       return wishListService.isInWishlist(movieId);
     };
 
-    const checkLoginState = () => {
-      const kakaoToken = localStorage.getItem("kakao_token");
-      isLoggedIn.value = !!kakaoToken;
-    };
-
     onMounted(() => {
       loadMovies();
-      checkLoginState();
     });
 
     return {
@@ -153,7 +143,6 @@ export default {
       popularMovies,
       newReleases,
       actionMovies,
-      isLoggedIn,
       handleWishlistClick,
       isInWishlist,
     };
