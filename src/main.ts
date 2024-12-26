@@ -7,6 +7,9 @@ import "./styles.css";
 
 const app = createApp(App);
 
+if (!window.Kakao.isInitialized()) {
+  window.Kakao.init("27d7fae4bb996ac3f5874f779a8f0df8");
+}
 // VueLazyload 설정
 app.use(VueLazyload, {
   preLoad: 1.3, // 미리 로드할 범위

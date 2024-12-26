@@ -1,6 +1,5 @@
 import { ref, computed, Ref, ComputedRef } from "vue";
 
-// Define a Movie interface
 export interface Movie {
   id: number;
   title: string;
@@ -14,29 +13,53 @@ export class WishList {
     this.wishlist = ref<Movie[]>(this.loadWishlist());
   }
 
-  // Load wishlist from localStorage
+  /**
+   * Load wishlist data from localStorage
+   * @returns {Movie[]} - The current wishlist for the logged-in user
+   */
   private loadWishlist(): Movie[] {
-    const storedWishlist = localStorage.getItem("movieWishlist");
+    const userId = localStorage.getItem("Kakao-Token");
+    if (!userId) {
+      console.warn("로그인이 필요합니다.");
+      return [];
+    }
+
+    const storedWishlist = localStorage.getItem(`movieWishlist_${userId}`);
     return storedWishlist ? JSON.parse(storedWishlist) : [];
   }
 
-  // Save wishlist to localStorage
+  /**
+   * Save the wishlist data to localStorage
+   */
   private saveWishlist(): void {
-    localStorage.setItem("movieWishlist", JSON.stringify(this.wishlist.value));
+    const userId = localStorage.getItem("Kakao-Token");
+    if (!userId) {
+      console.warn("로그인이 필요합니다. 위시리스트를 저장할 수 없습니다.");
+      return;
+    }
+
+    localStorage.setItem(
+      `movieWishlist_${userId}`,
+      JSON.stringify(this.wishlist.value)
+    );
   }
 
+  /**
+   * Add or remove a movie from the wishlist
+   * @param {Movie} movie - The movie to toggle in the wishlist
+   */
   toggleWishlist(movie: Movie): void {
     const index = this.wishlist.value.findIndex((item) => item.id === movie.id);
 
     if (index === -1) {
-      // Add the movie, ensuring poster_path and title are included
+      // Add the movie to the wishlist
       this.wishlist.value.push({
         id: movie.id,
         title: movie.title,
-        poster_path: movie.poster_path || "", // Default empty string if undefined
+        poster_path: movie.poster_path || "",
       });
     } else {
-      // Remove the movie if it already exists
+      // Remove the movie from the wishlist
       this.wishlist.value = this.wishlist.value.filter(
         (item) => item.id !== movie.id
       );
@@ -44,21 +67,32 @@ export class WishList {
 
     this.saveWishlist();
   }
-  // Check if a movie is in the wishlist
+
+  /**
+   * Check if a movie is in the wishlist
+   * @param {number} movieId - The ID of the movie to check
+   * @returns {boolean} - True if the movie is in the wishlist
+   */
   isInWishlist(movieId: number): boolean {
     return this.wishlist.value.some((item) => item.id === movieId);
   }
 
-  // Get the current wishlist as a reactive array
+  /**
+   * Get the current wishlist
+   * @returns {Movie[]} - The current wishlist
+   */
   getCurrentWishlist(): Movie[] {
     return this.wishlist.value;
   }
 
-  // Get the wishlist as a computed property for reactive binding
+  /**
+   * Reactive reference to the wishlist for computed properties
+   * @returns {ComputedRef<Movie[]>} - Computed reference of the wishlist
+   */
   get wishlist$(): ComputedRef<Movie[]> {
     return computed(() => this.wishlist.value);
   }
 }
 
-// Export a singleton instance of the WishList class
+// Export an instance of WishList for shared use across components
 export const wishListService = new WishList();

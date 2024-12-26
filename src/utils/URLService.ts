@@ -1,32 +1,32 @@
 import axios from "axios";
-import { Movie } from "@/type/type"; // Movie 타입 가져오기
+import { Movie } from "@/type/type";
 
 export class URLService {
-  async fetchFeaturedMovie(apiKey: string): Promise<Movie> {
+  private readonly API_KEY = "fb2191b2c2e7923b7b79f8e3fa925043";
+
+  async fetchFeaturedMovie(): Promise<Movie> {
     try {
       const response = await axios.get(
-        `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=ko-KR`
+        `https://api.themoviedb.org/3/movie/popular?api_key=${this.API_KEY}&language=ko-KR`
       );
-      console.log(response.data.results[0]);
       return response.data.results[0] as Movie;
     } catch (error) {
       console.error("Error fetching featured movie:", error);
-      throw error; // 에러를 호출한 쪽에서 처리할 수 있도록 다시 던짐
+      throw error;
     }
   }
 
-  getURL4PopularMovies(apiKey: string, page = 1): string {
-    return `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=ko-KR&page=${page}`;
+  getURL4PopularMovies(page = 1): string {
+    return `https://api.themoviedb.org/3/movie/popular?api_key=${this.API_KEY}&language=ko-KR&page=${page}`;
   }
 
-  getURL4ReleaseMovies(apiKey: string, page = 2): string {
-    return `https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}&language=ko-KR&page=${page}`;
+  getURL4ReleaseMovies(page = 2): string {
+    return `https://api.themoviedb.org/3/movie/now_playing?api_key=${this.API_KEY}&language=ko-KR&page=${page}`;
   }
 
-  getURL4GenreMovies(apiKey: string, genre: string, page = 1): string {
-    return `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_genres=${genre}&language=ko-KR&page=${page}`;
+  getURL4GenreMovies(genre: string, page = 1): string {
+    return `https://api.themoviedb.org/3/discover/movie?api_key=${this.API_KEY}&with_genres=${genre}&language=ko-KR&page=${page}`;
   }
 }
 
-// Export 단일 인스턴스
 export const urlService = new URLService();

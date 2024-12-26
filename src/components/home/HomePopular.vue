@@ -57,7 +57,7 @@ export default defineComponent({
     const voteAverage = ref(-1); // 기본 평점
 
     const fetchURL = computed(() => {
-      return urlService.getURL4PopularMovies(apiKey); // URL 생성
+      return urlService.getURL4PopularMovies(1); // apiKey 대신 page number 전달
     });
 
     const setView = (view: "grid" | "list") => {

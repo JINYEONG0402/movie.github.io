@@ -12,12 +12,12 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import Header from "@/components/home/Header.vue"; // Header 컴포넌트 경로를 확인 후 변경
+import Header from "@/components/home/Header.vue";
 
 export default defineComponent({
   name: "Home",
   components: {
-    Header, // Header 컴포넌트를 등록
+    Header,
   },
 });
 </script>
@@ -30,9 +30,9 @@ export default defineComponent({
   margin: 5px;
 
   @media (max-width: 390px) and (max-height: 844px) {
-    width: 100vw; /* 뷰포트 전체 너비 사용 */
-    height: 100vh; /* 뷰포트 전체 높이 사용 */
-    margin: 0; /* 마진 제거 */
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
   }
 }
 #container {

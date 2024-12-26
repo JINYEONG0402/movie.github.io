@@ -9,7 +9,7 @@
           v-for="movie in popularMovies"
           :key="movie.id"
           class="movie-card"
-          @click="toggleWishlist(movie)"
+          @click="handleWishlistClick(movie)"
         >
           <img
             :src="`https://image.tmdb.org/t/p/w500${movie.poster_path}`"
@@ -33,7 +33,7 @@
           v-for="movie in newReleases"
           :key="movie.id"
           class="movie-card"
-          @click="toggleWishlist(movie)"
+          @click="handleWishlistClick(movie)"
         >
           <img
             :src="`https://image.tmdb.org/t/p/w500${movie.poster_path}`"
@@ -57,7 +57,7 @@
           v-for="movie in actionMovies"
           :key="movie.id"
           class="movie-card"
-          @click="toggleWishlist(movie)"
+          @click="handleWishlistClick(movie)"
         >
           <img
             :src="`https://image.tmdb.org/t/p/w500${movie.poster_path}`"
@@ -80,13 +80,12 @@
 import { ref, onMounted } from "vue";
 import Banner from "@/components/home/Banner.vue";
 import { urlService } from "@/utils/URLService";
-import { wishListService } from "@/utils/WishList"; // 위시리스트 서비스 임포트
+import { wishListService } from "@/utils/WishList";
 
 export default {
   name: "HomeMain",
   components: { Banner },
   setup() {
-    const apiKey = localStorage.getItem("TMDb-Key");
     const featuredMovie = ref({
       title: "",
       overview: "",
@@ -98,31 +97,17 @@ export default {
 
     const loadMovies = async () => {
       try {
-        if (!apiKey) {
-          alert("API Key missing. Redirecting to login.");
-          location.href = "/signIn";
-          return;
-        }
-
-        // Fetch Popular Movies
-        const popularResponse = await fetch(
-          urlService.getURL4PopularMovies(apiKey)
-        );
+        const popularResponse = await fetch(urlService.getURL4PopularMovies());
         popularMovies.value = (await popularResponse.json()).results;
 
-        // Fetch New Releases
         const newReleasesResponse = await fetch(
-          urlService.getURL4ReleaseMovies(apiKey)
+          urlService.getURL4ReleaseMovies()
         );
         newReleases.value = (await newReleasesResponse.json()).results;
 
-        // Fetch Action Movies
-        const actionResponse = await fetch(
-          urlService.getURL4GenreMovies(apiKey, "28")
-        );
+        const actionResponse = await fetch(urlService.getURL4GenreMovies("28"));
         actionMovies.value = (await actionResponse.json()).results;
 
-        // Set 5th movie from popularMovies as the featured movie
         if (popularMovies.value.length >= 5) {
           const fifthMovie = popularMovies.value[4];
           featuredMovie.value = {
@@ -136,12 +121,15 @@ export default {
       }
     };
 
-    // 위시리스트 토글
-    const toggleWishlist = (movie) => {
+    const handleWishlistClick = (movie) => {
+      const kakaoToken = localStorage.getItem("kakao_token");
+      if (!kakaoToken) {
+        alert("위시리스트를 사용하려면 로그인이 필요합니다.");
+        return;
+      }
       wishListService.toggleWishlist(movie);
     };
 
-    // 위시리스트 확인
     const isInWishlist = (movieId) => {
       return wishListService.isInWishlist(movieId);
     };
@@ -155,7 +143,7 @@ export default {
       popularMovies,
       newReleases,
       actionMovies,
-      toggleWishlist,
+      handleWishlistClick,
       isInWishlist,
     };
   },
@@ -216,26 +204,27 @@ export default {
   box-shadow: 0 0 5px rgb(255, 53, 232);
   transform: scale(1.1);
 }
+
 @media screen and (max-width: 390px) and (max-height: 844px) {
   .movie-row {
-    gap: 8px; /* 카드 간격 더 줄이기 */
-    padding: 5px; /* 패딩 최소화 */
+    gap: 8px;
+    padding: 5px;
   }
 
   .movie-card {
-    width: 100px; /* 더 작은 카드 크기 */
+    width: 100px;
   }
 
   .movie-card img {
-    border-radius: 6px; /* 이미지 모서리 둥글게 */
+    border-radius: 6px;
   }
 
   .movie-card p {
-    font-size: 0.7rem; /* 텍스트 크기 줄이기 */
+    font-size: 0.7rem;
   }
 
   .wishlist-indicator {
-    width: 20px; /* 아이콘 크기 더 줄이기 */
+    width: 20px;
     height: 20px;
     font-size: 20px;
   }
