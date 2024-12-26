@@ -20,7 +20,17 @@
         </nav>
       </div>
       <div class="header-right">
-        <!-- 로그인 후 계정 정보 표시 -->
+        <button class="hamburger-menu" @click="toggleMobileMenu">
+          <font-awesome-icon icon="bars" />
+        </button>
+        <nav class="nav-links mobile-nav" :class="{ open: isMobileMenuOpen }">
+          <ul>
+            <li><router-link to="/">홈</router-link></li>
+            <li><router-link to="/popular">요즘 핫한</router-link></li>
+            <li><router-link to="/wishlist">위시 리스트</router-link></li>
+            <li><router-link to="/search">카테고리</router-link></li>
+          </ul>
+        </nav>
         <div v-if="isLoggedIn" class="user-info">
           <img
             v-if="userProfileImage"
@@ -31,7 +41,6 @@
           <span class="profile-nickname">{{ userNickname }}</span>
           <button class="logout-button" @click="confirmLogout">로그아웃</button>
         </div>
-        <!-- 로그인 전 유저 버튼 표시 -->
         <button v-else class="icon-button" @click="kakaoLogin">
           <font-awesome-icon icon="user" />
         </button>
@@ -44,10 +53,10 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faUser, faCube } from "@fortawesome/free-solid-svg-icons";
+import { faUser, faCube, faBars } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-library.add(faUser, faCube);
+library.add(faUser, faCube, faBars);
 
 export default {
   name: "AppHeader",
@@ -56,21 +65,24 @@ export default {
   },
   setup() {
     const isScrolled = ref(false);
+    const isMobileMenuOpen = ref(false);
     const isLoggedIn = ref(false);
     const userNickname = ref("");
     const userProfileImage = ref("");
     const router = useRouter();
 
-    // 환경 변수 가져오기
     const KAKAO_CLIENT_ID = process.env.VUE_APP_KAKAO_CLIENT_ID;
     const KAKAO_REDIRECT_URI = process.env.VUE_APP_KAKAO_REDIRECT_URI;
 
-    // 환경 변수 검증
     if (!KAKAO_CLIENT_ID || !KAKAO_REDIRECT_URI) {
       console.error(
         "카카오 클라이언트 ID 또는 리다이렉트 URI 설정되지 않았습니다."
       );
     }
+
+    const toggleMobileMenu = () => {
+      isMobileMenuOpen.value = !isMobileMenuOpen.value;
+    };
 
     const handleScroll = () => {
       isScrolled.value = window.scrollY > 50;
@@ -83,7 +95,7 @@ export default {
 
       const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${KAKAO_REDIRECT_URI}&response_type=code&scope=profile_nickname,profile_image,account_email`;
 
-      console.log("Kakao Auth URL:", KAKAO_AUTH_URL); // 디버깅용
+      console.log("Kakao Auth URL:", KAKAO_AUTH_URL);
       window.location.href = KAKAO_AUTH_URL;
     };
 
@@ -166,6 +178,8 @@ export default {
 
     return {
       isScrolled,
+      isMobileMenuOpen,
+      toggleMobileMenu,
       isLoggedIn,
       userNickname,
       userProfileImage,
@@ -203,7 +217,6 @@ export default {
   margin-right: 30px;
   font-size: 1.5rem;
 }
-
 .user-info {
   display: flex;
   align-items: center;
@@ -244,59 +257,66 @@ export default {
   cursor: pointer;
 }
 .nav-links {
-  display: flex; /* 가로로 정렬 */
-  gap: 20px; /* 각 항목 간격 */
-  list-style: none; /* 기본 리스트 스타일 제거 */
-  margin: 0; /* 여백 제거 */
-  padding: 0; /* 여백 제거 */
+  display: flex;
+  gap: 20px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.nav-links li {
-  display: inline; /* 리스트 아이템을 가로로 배치 */
+.nav-links ul {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .nav-links a {
   color: white;
-  text-decoration: none; /* 밑줄 제거 */
+  text-decoration: none;
   font-size: 1rem;
-  padding: 5px 10px; /* 간격 추가 */
-  transition: color 0.3s ease; /* 색상 전환 효과 */
+  padding: 5px 10px;
+  transition: color 0.3s ease;
 }
 
 .nav-links a:hover {
-  color: #f203ff; /* 마우스 호버 시 색상 변경 */
+  color: #f203ff;
 }
-/* 모바일 반응형 스타일 */
+
+.hamburger-menu {
+  display: none;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.mobile-nav {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  top: 60px;
+  left: 0;
+  right: 0;
+  background-color: #000;
+  padding: 10px;
+  border-top: 1px solid #333;
+}
+
+.mobile-nav.open {
+  display: flex;
+}
+
 @media screen and (max-width: 768px) {
   .hamburger-menu {
     display: block;
   }
 
-  .nav-links {
-    display: none; /* 기본 상태에서 숨김 */
-    flex-direction: column;
-    position: absolute;
-    top: 60px;
-    left: 0;
-    right: 0;
-    background-color: #000;
-    padding: 10px;
-    border-top: 1px solid #333;
-  }
-
-  .nav-links.open {
-    display: flex; /* 햄버거 메뉴 클릭 시 보이도록 설정 */
-  }
-
-  .nav-links ul {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .nav-links a {
-    font-size: 1.2rem;
-    text-align: center;
-    padding: 10px 0;
+  .desktop-nav {
+    display: none;
   }
 }
 </style>

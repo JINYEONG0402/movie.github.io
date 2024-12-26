@@ -5,20 +5,59 @@
     <section class="movie-section">
       <h2>인기영화</h2>
       <div class="movie-row">
-        <div
-          v-for="movie in popularMovies"
-          :key="movie.id"
-          class="movie-card"
-          @click="openMovieDetails(movie)"
-        >
+        <div v-for="movie in popularMovies" :key="movie.id" class="movie-card">
           <img
             :src="`https://image.tmdb.org/t/p/w500${movie.poster_path}`"
             :alt="movie.title"
+            @click="openMovieDetails(movie)"
           />
           <p>{{ movie.title }}</p>
           <span
             class="wishlist-indicator"
             :class="{ active: isInWishlist(movie.id) }"
+            @click.stop="handleWishlistClick(movie)"
+          >
+            ♥
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <section class="movie-section">
+      <h2>신작</h2>
+      <div class="movie-row">
+        <div v-for="movie in newReleases" :key="movie.id" class="movie-card">
+          <img
+            :src="`https://image.tmdb.org/t/p/w500${movie.poster_path}`"
+            :alt="movie.title"
+            @click="openMovieDetails(movie)"
+          />
+          <p>{{ movie.title }}</p>
+          <span
+            class="wishlist-indicator"
+            :class="{ active: isInWishlist(movie.id) }"
+            @click.stop="handleWishlistClick(movie)"
+          >
+            ♥
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <section class="movie-section">
+      <h2>액션영화</h2>
+      <div class="movie-row">
+        <div v-for="movie in actionMovies" :key="movie.id" class="movie-card">
+          <img
+            :src="`https://image.tmdb.org/t/p/w500${movie.poster_path}`"
+            :alt="movie.title"
+            @click="openMovieDetails(movie)"
+          />
+          <p>{{ movie.title }}</p>
+          <span
+            class="wishlist-indicator"
+            :class="{ active: isInWishlist(movie.id) }"
+            @click.stop="handleWishlistClick(movie)"
           >
             ♥
           </span>
@@ -64,12 +103,22 @@ export default {
   setup() {
     const featuredMovie = ref({});
     const popularMovies = ref([]);
+    const newReleases = ref([]);
+    const actionMovies = ref([]);
     const selectedMovie = ref(null);
 
     const loadMovies = async () => {
       try {
         const popularResponse = await fetch(urlService.getURL4PopularMovies());
         popularMovies.value = (await popularResponse.json()).results;
+
+        const newReleasesResponse = await fetch(
+          urlService.getURL4ReleaseMovies()
+        );
+        newReleases.value = (await newReleasesResponse.json()).results;
+
+        const actionResponse = await fetch(urlService.getURL4GenreMovies("28"));
+        actionMovies.value = (await actionResponse.json()).results;
 
         if (popularMovies.value.length >= 1) {
           featuredMovie.value = popularMovies.value[0]; // 첫 번째 영화를 배너로 설정
@@ -87,6 +136,10 @@ export default {
       selectedMovie.value = null;
     };
 
+    const handleWishlistClick = (movie) => {
+      wishListService.toggleWishlist(movie);
+    };
+
     const isInWishlist = (movieId) => {
       return wishListService.isInWishlist(movieId);
     };
@@ -98,9 +151,12 @@ export default {
     return {
       featuredMovie,
       popularMovies,
+      newReleases,
+      actionMovies,
       selectedMovie,
       openMovieDetails,
       closeMovieDetails,
+      handleWishlistClick,
       isInWishlist,
     };
   },
@@ -144,10 +200,21 @@ export default {
   height: 30px;
   font-size: 30px;
   color: #ffffff;
-  background-color: rgb(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: color 0.3s, transform 0.3s;
+}
+.wishlist-indicator.active {
+  color: rgb(255, 53, 232); /* 하트 색상 변경 */
+  transform: scale(1.1); /* 크기 확대 */
+}
+
+.wishlist-indicator:hover {
+  transform: scale(1.2);
 }
 /* 모달 스타일 */
 .movie-details-modal {
@@ -167,8 +234,8 @@ export default {
 .modal-content {
   background-color: #fff;
   border-radius: 12px;
-  max-width: 400px; /* 너비를 400px로 축소 */
-  width: 90%; /* 모바일에서 화면 크기에 맞게 조정 */
+  max-width: 400px;
+  width: 90%;
   text-align: center;
   overflow: hidden;
   display: flex;
@@ -178,27 +245,27 @@ export default {
 
 .movie-poster {
   width: 100%;
-  max-height: 250px; /* 포스터 높이 제한 */
-  object-fit: contain; /* 비율 유지하며 전체 이미지 표시 */
+  max-height: 300px;
+  object-fit: contain;
   border-bottom: 1px solid #ccc;
-  background-color: #000; /* 빈 공간 배경을 검정색으로 설정 */
+  background-color: #000;
 }
 
 .modal-info {
-  padding: 15px; /* 패딩 축소 */
+  padding: 15px;
   text-align: left;
 }
 
 .modal-info h2 {
   margin: 10px 0;
-  font-size: 1.3rem; /* 제목 폰트 크기 축소 */
+  font-size: 1.3rem;
   color: #333;
 }
 
 .modal-info p {
-  font-size: 0.9rem; /* 본문 폰트 크기 축소 */
+  font-size: 0.9rem;
   color: #555;
-  line-height: 1.4; /* 줄 간격 */
+  line-height: 1.4;
 }
 
 .overview {
@@ -210,7 +277,7 @@ export default {
   position: absolute;
   top: 5px;
   right: 5px;
-  font-size: 1.2rem; /* 버튼 크기 축소 */
+  font-size: 1.2rem;
   cursor: pointer;
   background: none;
   border: none;
@@ -218,14 +285,14 @@ export default {
 }
 
 .close-modal-button {
-  margin-top: 10px; /* 간격 축소 */
-  padding: 8px 16px; /* 버튼 크기 축소 */
+  margin-top: 10px;
+  padding: 8px 16px;
   background-color: #535bf2;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 0.9rem; /* 버튼 폰트 크기 축소 */
+  font-size: 0.9rem;
 }
 
 .close-modal-button:hover {
@@ -239,7 +306,7 @@ export default {
   }
 
   .modal-info h2 {
-    font-size: 1.1rem; /* 더 작은 화면에서 제목 크기 조정 */
+    font-size: 1.1rem;
   }
 
   .modal-info p {
